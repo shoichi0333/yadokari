@@ -1,0 +1,121 @@
+# YADOKARI Deploy Readiness Runbook
+
+Last updated: 2026-05-17
+
+## Goal
+
+Bring the app to a deployable state with repeatable checks, safe fallbacks, and post-deploy visibility.
+
+## Predeploy Command
+
+Run from `YADOKARI/yadokari-app`:
+
+```powershell
+npm run predeploy
+```
+
+This runs:
+
+1. `npm run lint`
+2. `npm run typecheck`
+3. `tsx scripts/predeploy-check.ts`
+4. `npm run build`
+
+Local runs warn on missing production integrations. Vercel/CI runs fail when required production environment is missing.
+
+To enforce production environment locally:
+
+```powershell
+$env:ENFORCE_DEPLOY_ENV="true"
+npm run predeploy
+```
+
+## Required Before Public Launch
+
+- `NEXT_PUBLIC_SITE_URL`
+- Supabase project and auth settings
+- `DATABASE_URL`
+- Stripe live keys and price IDs
+- Stripe webhook secret
+- Resend API key
+- `CONTACT_EMAIL`
+
+See `docs/production-integrations.md` for service-by-service setup.
+
+The app can still build without optional integrations, but paid checkout and email delivery stay in fallback/preparation mode.
+
+## Health Check
+
+After deploy:
+
+```text
+https://yadokari.jp/api/health
+```
+
+Expected shape:
+
+```json
+{
+  "ok": true,
+  "status": "ok",
+  "checks": {
+    "siteUrl": true,
+    "supabase": true,
+    "database": true,
+    "stripe": true,
+    "email": true,
+    "listings": true
+  }
+}
+```
+
+`status: "degraded"` means the app is serving but at least one production integration is not configured.
+
+## Smoke Test
+
+Against local dev server:
+
+```powershell
+cd YADOKARI\yadokari-app
+npm run dev
+npm run smoke
+```
+
+Against production:
+
+```powershell
+$env:SMOKE_BASE_URL="https://yadokari.jp"
+npm run smoke
+```
+
+The smoke test checks:
+
+- top page
+- property search
+- checker
+- address report
+- report-context pricing page
+- address-prefilled contact page
+- health API
+- OpenGraph image
+
+## Launch Smoke Test
+
+1. `/` loads and header/footer are clean.
+2. `/check` can check `東京都港区六本木`.
+3. Result page links to `/report?address=...`.
+4. `/report` shows free preview.
+5. `/pricing?source=report&address=...` shows report-context upsell.
+6. `/contact?address=...` pre-fills the address and message.
+7. `/api/health` returns `ok: true`.
+8. `/opengraph-image` renders a 1200x630 image.
+
+## Codex Operations
+
+Codex should own:
+
+- Monthly listing data verification after scraper runs.
+- Health check review after deploys.
+- Pricing and checkout smoke tests when Stripe keys change.
+- Report conversion copy and UI iteration.
+- Build/lint/typecheck before any deploy.

@@ -1,0 +1,143 @@
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+
+type ListingPayload = {
+  title?: unknown;
+  prefecture?: unknown;
+  city?: unknown;
+  address?: unknown;
+  rent?: unknown;
+  layout?: unknown;
+  areaSqm?: unknown;
+  ageYears?: unknown;
+  zoning?: unknown;
+  isTokkuArea?: unknown;
+  description?: unknown;
+  features?: unknown;
+  contactEmail?: unknown;
+  contactPhone?: unknown;
+};
+
+const REQUIRED_FIELDS = ["title", "address", "prefecture", "city", "rent", "layout", "description", "contactEmail"] as const;
+
+function toTrimmedString(value: unknown): string {
+  return typeof value === "string" ? value.trim() : "";
+}
+
+function toOptionalString(value: unknown): string | undefined {
+  const trimmed = toTrimmedString(value);
+  return trimmed || undefined;
+}
+
+function toNumber(value: unknown): number | undefined {
+  if (typeof value === "number") return Number.isFinite(value) ? value : undefined;
+  if (typeof value !== "string" || !value.trim()) return undefined;
+
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : undefined;
+}
+
+function toStringArray(value: unknown): string[] {
+  if (Array.isArray(value)) {
+    return value.map((item) => toTrimmedString(item)).filter(Boolean);
+  }
+
+  if (typeof value === "string") {
+    return value
+      .split(",")
+      .map((item) => item.trim())
+      .filter(Boolean);
+  }
+
+  return [];
+}
+
+function getMissingFields(payload: ListingPayload): string[] {
+  return REQUIRED_FIELDS.filter((field) => {
+    if (field === "rent") return toNumber(payload[field]) === undefined;
+    return !toTrimmedString(payload[field]);
+  });
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const payload = (await request.json()) as ListingPayload;
+    const missingFields = getMissingFields(payload);
+
+    if (missingFields.length > 0) {
+      return NextResponse.json(
+        { error: `必須項目が不足しています: ${missingFields.join(", ")}` },
+        { status: 400 },
+      );
+    }
+
+    const listingData = {
+      title: toTrimmedString(payload.title),
+      prefecture: toTrimmedString(payload.prefecture),
+      city: toTrimmedString(payload.city),
+      address: toTrimmedString(payload.address),
+      rent: toNumber(payload.rent) ?? 0,
+      layout: toTrimmedString(payload.layout),
+      areaSqm: toNumber(payload.areaSqm) ?? 0,
+      ageYears: toNumber(payload.ageYears),
+      zoning: toOptionalString(payload.zoning),
+      isTokkuArea: Boolean(payload.isTokkuArea),
+      description: toTrimmedString(payload.description),
+      features: toStringArray(payload.features),
+      images: [],
+      contactEmail: toTrimmedString(payload.contactEmail),
+      contactPhone: toOptionalString(payload.contactPhone),
+    };
+
+    if (!process.env.DATABASE_URL) {
+      const id = `mock_${Date.now()}`;
+      console.log("Property listing submission:", { id, ...listingData, status: "PENDING" });
+      return NextResponse.json({ id, status: "PENDING" });
+    }
+
+    const user = await prisma.user.upsert({
+      where: { email: listingData.contactEmail },
+      update: {},
+      create: {
+        email: listingData.contactEmail,
+        name: listingData.contactEmail.split("@")[0] || "Listing Owner",
+        plan: "PRO",
+      },
+    });
+
+    const listing = await prisma.propertyListing.create({
+      data: {
+        ...listingData,
+        userId: user.id,
+        status: "PENDING",
+      },
+      select: {
+        id: true,
+        status: true,
+      },
+    });
+
+    return NextResponse.json(listing);
+  } catch (error) {
+    console.error("Failed to submit property listing:", error);
+    return NextResponse.json({ error: "物件掲載申請の送信に失敗しました" }, { status: 500 });
+  }
+}
+
+export async function GET() {
+  try {
+    if (!process.env.DATABASE_URL) {
+      return NextResponse.json([]);
+    }
+
+    const listings = await prisma.propertyListing.findMany({
+      where: { status: "ACTIVE" },
+      orderBy: { createdAt: "desc" },
+    });
+
+    return NextResponse.json(listings);
+  } catch (error) {
+    console.error("Failed to fetch property listings:", error);
+    return NextResponse.json({ error: "物件一覧の取得に失敗しました" }, { status: 500 });
+  }
+}

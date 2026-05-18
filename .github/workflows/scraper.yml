@@ -1,0 +1,64 @@
+name: 民泊データ自動更新
+
+on:
+  schedule:
+    # 毎月1日 09:00 JST (= 00:00 UTC)
+    - cron: "0 0 1 * *"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Dry run (出力ファイルをコミットしない)"
+        required: false
+        default: "false"
+
+jobs:
+  fetch-and-update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: YADOKARI/scraper/requirements.txt
+
+      - name: Install dependencies
+        run: pip install -r YADOKARI/scraper/requirements.txt
+
+      - name: Run scraper
+        run: python YADOKARI/scraper/main.py
+        env:
+          # 将来的にAPIキーが必要になった場合はここに追加
+          TZ: Asia/Tokyo
+
+      - name: Check output
+        run: |
+          echo "=== 出力ファイル確認 ==="
+          cat YADOKARI/yadokari-app/public/data/minpaku_listings.json | python3 -c "
+          import json, sys
+          d = json.load(sys.stdin)
+          print(f'totalCount: {d[\"totalCount\"]}')
+          print(f'updatedAt: {d[\"updatedAt\"]}')
+          print(f'prefectures: {len(set(l[\"prefecture\"] for l in d[\"listings\"]))}')
+          "
+
+      - name: Commit updated data
+        if: github.event.inputs.dry_run != 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add YADOKARI/yadokari-app/public/data/minpaku_listings.json
+          if git diff --staged --quiet; then
+            echo "変更なし - コミットをスキップ"
+          else
+            TIMESTAMP=$(date +"%Y-%m-%d")
+            COUNT=$(cat YADOKARI/yadokari-app/public/data/minpaku_listings.json | python3 -c "import json,sys; print(json.load(sys.stdin)['totalCount'])")
+            git commit -m "data: 民泊届出データ更新 ${TIMESTAMP} (${COUNT}件)"
+            git push
+          fi

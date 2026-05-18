@@ -1,0 +1,179 @@
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Property {
+  id               String    @id @default(uuid())
+  title            String
+  address          String
+  prefecture       String
+  city             String
+  nearestStation   String?
+  minutesToStation Int?
+  lat              Float
+  lng              Float
+  rent             Int
+  layout           String?
+  areaSqm          Float?
+  ageYears         Int?
+  floor            Int?
+  buildingFloors   Int?
+  zoning           String?
+  isTokkuArea      Boolean   @default(false)
+  minpakuType      String?
+  maxDays          Int?
+  images           String[]
+  features         String[]
+  description      String?
+  sourceUrl        String?
+  isActive         Boolean   @default(true)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  @@index([prefecture])
+  @@index([minpakuType])
+  @@index([rent])
+}
+
+model User {
+  id                String            @id @default(uuid())
+  email             String            @unique
+  name              String
+  stripeCustomerId  String?           @unique
+  plan              PlanType          @default(FREE)
+  createdAt         DateTime          @default(now())
+  favorites         Favorite[]
+  checkHistories    CheckHistory[]
+  inquiries         Inquiry[]
+  savedReports      SavedReport[]
+  subscription      Subscription?
+  listings          PropertyListing[]
+}
+
+enum PlanType {
+  FREE
+  STANDARD
+  PRO
+}
+
+model Subscription {
+  id                   String    @id @default(uuid())
+  userId               String    @unique
+  plan                 PlanType
+  stripeSubscriptionId String    @unique
+  status               String    // active | canceled | past_due
+  currentPeriodEnd     DateTime
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+  user                 User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Favorite {
+  id         String   @id @default(uuid())
+  userId     String
+  propertyId String
+  createdAt  DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, propertyId])
+}
+
+model CheckHistory {
+  id        String   @id @default(uuid())
+  userId    String
+  address   String
+  prefecture String?
+  ward      String?
+  juutaku   Boolean
+  tokku     Boolean
+  ryokan    Boolean
+  checkedAt DateTime @default(now())
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, checkedAt])
+  @@unique([userId, address])
+}
+
+model SavedReport {
+  id                String   @id @default(uuid())
+  userId            String
+  address           String
+  prefecture        String?
+  ward              String?
+  recommendedType   String
+  score             Int
+  monthlyRevenueMin Int?
+  monthlyRevenueMax Int?
+  snapshot          Json?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@unique([userId, address])
+}
+
+model Inquiry {
+  id         String          @id @default(uuid())
+  userId     String?
+  propertyId String
+  listingId  String?
+  name       String
+  email      String
+  phone      String?
+  message    String
+  status     InquiryStatus   @default(NEW)
+  createdAt  DateTime        @default(now())
+  user       User?           @relation(fields: [userId], references: [id], onDelete: SetNull)
+  listing    PropertyListing? @relation(fields: [listingId], references: [id], onDelete: SetNull)
+}
+
+enum InquiryStatus {
+  NEW
+  REPLIED
+  CLOSED
+}
+
+model PropertyListing {
+  id               String        @id @default(uuid())
+  userId           String
+  title            String
+  address          String
+  prefecture       String
+  city             String
+  rent             Int
+  layout           String
+  areaSqm          Float
+  ageYears         Int?
+  floor            Int?
+  buildingFloors   Int?
+  zoning           String?
+  isTokkuArea      Boolean       @default(false)
+  description      String
+  features         String[]
+  images           String[]
+  contactEmail     String
+  contactPhone     String?
+  status           ListingStatus @default(PENDING)
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+  user             User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  inquiries        Inquiry[]
+
+  @@index([prefecture])
+  @@index([status])
+}
+
+enum ListingStatus {
+  PENDING
+  ACTIVE
+  REJECTED
+  EXPIRED
+}

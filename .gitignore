@@ -1,0 +1,7 @@
+# Secrets / API keys
+YADOKARI/docs/codex_API.txt
+YADOKARI/docs/yadokari-github-token.txt
+
+# Claude Code local settings
+.claude/settings.local.json
+.claude/scheduled_tasks.lock
