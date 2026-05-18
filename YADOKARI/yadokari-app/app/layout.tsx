@@ -5,9 +5,10 @@ import Header from "@/components/Header";
 import BottomNav from "@/components/BottomNav";
 import { AuthProvider } from "@/lib/AuthContext";
 import { ToastProvider } from "@/lib/ToastContext";
+import { getSiteUrl } from "@/lib/config";
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
+  metadataBase: new URL(getSiteUrl()),
   title: {
     default: "YADOKARI（ヤドカリ）",
     template: "%s | YADOKARI",
