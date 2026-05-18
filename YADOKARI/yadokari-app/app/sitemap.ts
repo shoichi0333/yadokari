@@ -3,7 +3,7 @@ import { WARD_ZONING_MAP } from "@/lib/data/wardZoning";
 import { BLOG_POSTS } from "@/lib/data/blogPosts";
 import { PROPERTIES } from "@/lib/data/properties";
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://yadokari.jp";
+const BASE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://yadokari.jp").replace(/^﻿/, "").replace(/\/$/, "");
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const prefectures = [...new Set(WARD_ZONING_MAP.map((w) => w.prefecture))];
