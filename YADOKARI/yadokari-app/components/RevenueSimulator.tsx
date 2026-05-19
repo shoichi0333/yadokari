@@ -2,7 +2,8 @@
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
-import { Calculator, Crown, Info, Lock, TrendingUp } from "lucide-react";
+import { Calculator, Crown, Info, TrendingUp } from "lucide-react";
+import PlanGate from "@/components/PlanGate";
 import { simulate, formatCurrency, SimulatorInput } from "@/lib/simulator";
 import { getCurrentPlan } from "@/lib/plan";
 
@@ -13,12 +14,14 @@ interface Props {
 
 export default function RevenueSimulator({ propertyRent, maxDays }: Props) {
   const operatingDaysMax = maxDays ?? 365;
-  const isPaid = getCurrentPlan() !== "free";
+  const currentPlan = getCurrentPlan();
+  const isFree = currentPlan === "free";
+  const isPaid = !isFree;
 
   const [input, setInput] = useState<SimulatorInput>({
     propertyRent,
     nightlyRate: 15000,
-    occupancyRate: 65,
+    occupancyRate: 70,
     operatingDaysPerYear: Math.min(operatingDaysMax, 180),
     cleaningFee: 3000,
     platformFee: 15,
@@ -65,6 +68,8 @@ export default function RevenueSimulator({ propertyRent, maxDays }: Props) {
           step={5}
           format={(v) => `${v}%`}
           onChange={(v) => update("occupancyRate", v)}
+          disabled={isFree}
+          note={isFree ? "稼働率はフリープランでは70%固定です" : undefined}
         />
         <SliderField
           label="年間営業日数"
@@ -78,8 +83,8 @@ export default function RevenueSimulator({ propertyRent, maxDays }: Props) {
         />
 
         {/* 詳細スライダー（有料プランのみ） */}
-        {isPaid ? (
-          <>
+        <div className="relative min-h-64">
+          <div className={isPaid ? "space-y-5" : "pointer-events-none space-y-5 select-none blur-sm"}>
             <SliderField
               label="清掃費"
               value={input.cleaningFee}
@@ -107,15 +112,15 @@ export default function RevenueSimulator({ propertyRent, maxDays }: Props) {
               format={(v) => formatCurrency(v) + "/月"}
               onChange={(v) => update("otherMonthlyCost", v)}
             />
-          </>
-        ) : (
-          <div className="rounded-xl border border-dashed border-teal-200 bg-teal-50/60 px-4 py-3">
-            <div className="flex items-center gap-2 text-teal-700">
-              <Lock size={13} />
-              <span className="text-xs font-semibold">清掃費・手数料・その他経費の調整は有料プランで解放</span>
-            </div>
           </div>
-        )}
+          {!isPaid && (
+            <PlanGate
+              title="詳細設定はスタンダードプラン以上で利用可能"
+              description="清掃費・手数料・その他経費を調整して、より精度の高い収益試算ができます。"
+              buttonLabel="スタンダードプランにアップグレード"
+            />
+          )}
+        </div>
 
         {/* 結果 */}
         <div className="space-y-3">
@@ -183,7 +188,7 @@ export default function RevenueSimulator({ propertyRent, maxDays }: Props) {
 }
 
 function SliderField({
-  label, value, min, max, step, format, onChange, note,
+  label, value, min, max, step, format, onChange, note, disabled = false,
 }: {
   label: string;
   value: number;
@@ -193,6 +198,7 @@ function SliderField({
   format: (v: number) => string;
   onChange: (v: number) => void;
   note?: string;
+  disabled?: boolean;
 }) {
   return (
     <div>
@@ -206,8 +212,9 @@ function SliderField({
         max={max}
         step={step}
         value={value}
+        disabled={disabled}
         onChange={(e) => onChange(Number(e.target.value))}
-        className="w-full accent-teal-600"
+        className="w-full accent-teal-600 disabled:cursor-not-allowed disabled:opacity-50"
       />
       {note && (
         <p className="text-xs text-amber-600 mt-1 flex items-center gap-1">

@@ -1,3 +1,5 @@
+import { getCurrentPlan } from "@/lib/plan";
+
 const HISTORY_KEY = "yadokari_check_history";
 
 export type CheckHistoryEntry = {
@@ -22,6 +24,11 @@ export function getCheckHistory(): CheckHistoryEntry[] {
 export function saveCheckHistory(entry: CheckHistoryEntry) {
   if (typeof window === "undefined") return;
   const history = getCheckHistory().filter((h) => h.address !== entry.address);
+
+  if (getCurrentPlan() === "free" && history.length >= 3) {
+    return;
+  }
+
   const updated = [entry, ...history].slice(0, 20);
   localStorage.setItem(HISTORY_KEY, JSON.stringify(updated));
 }
