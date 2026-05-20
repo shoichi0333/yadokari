@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, Building2, MapPin } from "lucide-react";
 import { WARD_ZONING_MAP } from "@/lib/data/wardZoning";
+import { getSiteUrl } from "@/lib/config";
+
+const siteUrl = getSiteUrl();
 
 export const metadata: Metadata = {
   title: "エリア別 民泊可否ガイド | YADOKARI",
@@ -35,8 +38,8 @@ const jsonLd = {
   "@context": "https://schema.org",
   "@type": "BreadcrumbList",
   itemListElement: [
-    { "@type": "ListItem", position: 1, name: "ホーム", item: "https://yadokari.jp" },
-    { "@type": "ListItem", position: 2, name: "エリア別民泊可否ガイド", item: "https://yadokari.jp/area" },
+    { "@type": "ListItem", position: 1, name: "ホーム", item: siteUrl },
+    { "@type": "ListItem", position: 2, name: "エリア別民泊可否ガイド", item: `${siteUrl}/area` },
   ],
 };
 

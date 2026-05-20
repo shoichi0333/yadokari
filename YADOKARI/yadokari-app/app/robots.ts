@@ -1,6 +1,7 @@
 import { MetadataRoute } from "next";
+import { getSiteUrl } from "@/lib/config";
 
-const BASE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://yadokari.jp").replace(/^﻿/, "").replace(/\/$/, "");
+const BASE_URL = getSiteUrl();
 
 export default function robots(): MetadataRoute.Robots {
   return {

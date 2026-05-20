@@ -1,10 +1,35 @@
 # YADOKARI Deploy Readiness Runbook
 
-Last updated: 2026-05-17
+Last updated: 2026-05-20
 
 ## Goal
 
 Bring the app to a deployable state with repeatable checks, safe fallbacks, and post-deploy visibility.
+
+## 2026-05-20 Post-Deploy Snapshot
+
+Verified deployment:
+
+```text
+https://yadokari-app.vercel.app
+```
+
+Checks completed:
+
+- `npm run predeploy` passed locally.
+- Production smoke test passed against `https://yadokari-app.vercel.app`.
+- `/api/health` returned `ok: true` and `status: "degraded"`.
+- Health details: `email: false`; site URL, Supabase, database, Stripe, and listings were configured.
+- Latest Vercel deployment was `Ready`.
+- `NEXT_PUBLIC_SITE_URL` is set to `https://yadokari.jp` in Vercel production.
+- Sitemap, robots, OGP, and JSON-LD URLs are generated from `NEXT_PUBLIC_SITE_URL`.
+
+Remaining launch tasks:
+
+- Configure `RESEND_API_KEY` in Vercel so lead/contact email delivery is active.
+- Confirm `CONTACT_EMAIL` is set in Vercel production.
+- Configure DNS for `yadokari.jp`; Vercel recommends `A yadokari.jp 76.76.21.21`.
+- Re-run production smoke after DNS propagation and email setup.
 
 ## Predeploy Command
 

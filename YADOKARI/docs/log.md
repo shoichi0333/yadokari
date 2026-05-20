@@ -2,6 +2,30 @@
 
 ---
 
+## 2026-05-20: デプロイ後確認
+
+### 確認結果
+- `npm run predeploy` 成功（lint / typecheck / predeploy-check / production build）。
+- ローカル production server に対する `npm run smoke` 成功。
+- Vercel 最新 production deployment は `Ready`。
+- 公開 alias `https://yadokari-app.vercel.app` に対する `npm run smoke` 成功。
+- `/api/health` は `ok: true`, `status: "degraded"`。詳細は `email: false` のみ。
+- `yadokari.jp` は Vercel に紐づいているが、DNS が未設定。Vercel 推奨は `A yadokari.jp 76.76.21.21`。
+- Vercel production の `NEXT_PUBLIC_SITE_URL` を `https://yadokari.jp` に更新し、production 再デプロイ済み。
+- sitemap / robots / OGP / JSON-LD の URL は `https://yadokari.jp` に統一済み。
+
+### 対応
+- `.claude/settings.local.json` から平文トークン・DBパスワードを含む許可エントリを削除。
+- `NEXT_PUBLIC_SITE_URL` を参照するよう、トップ・ブログ・エリアページの OGP/JSON-LD と sitemap/robots を修正。
+- `docs/production-integrations.md` と `docs/deploy-readiness-runbook.md` にデプロイ後状態と残タスクを追記。
+
+### 残タスク
+1. Vercel production に `RESEND_API_KEY` を設定し、`CONTACT_EMAIL` を確認する。
+2. `yadokari.jp` の DNS を設定する。
+3. DNS とメール設定後に `SMOKE_BASE_URL=https://yadokari.jp npm run smoke` を再実行する。
+
+---
+
 ## 2026-05-14（セッション続き：コンタクト・lint修正・SEO追加）
 
 ### 完了タスク

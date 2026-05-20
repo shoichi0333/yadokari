@@ -2,8 +2,9 @@ import { MetadataRoute } from "next";
 import { WARD_ZONING_MAP } from "@/lib/data/wardZoning";
 import { BLOG_POSTS } from "@/lib/data/blogPosts";
 import { PROPERTIES } from "@/lib/data/properties";
+import { getSiteUrl } from "@/lib/config";
 
-const BASE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://yadokari.jp").replace(/^﻿/, "").replace(/\/$/, "");
+const BASE_URL = getSiteUrl();
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const prefectures = [...new Set(WARD_ZONING_MAP.map((w) => w.prefecture))];

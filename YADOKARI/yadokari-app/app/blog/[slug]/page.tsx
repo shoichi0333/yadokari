@@ -4,6 +4,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, Clock, ArrowRight, Shield, Building2 } from "lucide-react";
 import { BLOG_POSTS, getBlogPost } from "@/lib/data/blogPosts";
+import { getSiteUrl } from "@/lib/config";
+
+const siteUrl = getSiteUrl();
 
 type PageProps = { params: Promise<{ slug: string }> };
 
@@ -122,23 +125,23 @@ export default async function BlogPostPage({ params }: PageProps) {
       {
         "@type": "BreadcrumbList",
         itemListElement: [
-          { "@type": "ListItem", position: 1, name: "ホーム", item: "https://yadokari.jp" },
-          { "@type": "ListItem", position: 2, name: "民泊コラム", item: "https://yadokari.jp/blog" },
-          { "@type": "ListItem", position: 3, name: post.title, item: `https://yadokari.jp/blog/${post.slug}` },
+          { "@type": "ListItem", position: 1, name: "ホーム", item: siteUrl },
+          { "@type": "ListItem", position: 2, name: "民泊コラム", item: `${siteUrl}/blog` },
+          { "@type": "ListItem", position: 3, name: post.title, item: `${siteUrl}/blog/${post.slug}` },
         ],
       },
       {
         "@type": "BlogPosting",
         headline: post.title,
         description: post.description,
-        url: `https://yadokari.jp/blog/${post.slug}`,
+        url: `${siteUrl}/blog/${post.slug}`,
         datePublished: post.publishedAt,
         dateModified: post.updatedAt ?? post.publishedAt,
         author: { "@type": "Organization", name: "YADOKARI" },
         publisher: {
           "@type": "Organization",
           name: "YADOKARI",
-          logo: { "@type": "ImageObject", url: "https://yadokari.jp/opengraph-image" },
+          logo: { "@type": "ImageObject", url: `${siteUrl}/opengraph-image` },
         },
       },
     ],

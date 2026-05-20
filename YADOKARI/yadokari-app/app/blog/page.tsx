@@ -3,6 +3,9 @@ import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, Clock, BookOpen } from "lucide-react";
 import { BLOG_POSTS } from "@/lib/data/blogPosts";
+import { getSiteUrl } from "@/lib/config";
+
+const siteUrl = getSiteUrl();
 
 export const metadata: Metadata = {
   title: "民泊コラム | YADOKARI",
@@ -18,13 +21,13 @@ const blogListJsonLd = {
   "@context": "https://schema.org",
   "@type": "Blog",
   name: "YADOKARI 民泊コラム",
-  url: "https://yadokari.jp/blog",
+  url: `${siteUrl}/blog`,
   description: "民泊投資・法規制・エリアガイドに関するコラム",
   blogPost: BLOG_POSTS.map((post) => ({
     "@type": "BlogPosting",
     headline: post.title,
     description: post.description,
-    url: `https://yadokari.jp/blog/${post.slug}`,
+    url: `${siteUrl}/blog/${post.slug}`,
     datePublished: post.publishedAt,
   })),
 };

@@ -7,6 +7,9 @@ import { ArrowRight, BookOpen, Building2, CheckCircle2, MapPin, Shield, Trending
 import MinpakuBadge from "@/components/MinpakuBadge";
 import { WARD_ZONING_MAP } from "@/lib/data/wardZoning";
 import { getMinpakuInfo, getMinpakuBadgeType } from "@/lib/minpaku";
+import { getSiteUrl } from "@/lib/config";
+
+const siteUrl = getSiteUrl();
 
 const PREFECTURE_BLOG_MAP: Record<string, { slug: string; title: string }> = {
   "東京都": { slug: "tokyo-minpaku-guide", title: "東京で民泊を始めるには？23区別の可否まとめ" },
@@ -111,9 +114,9 @@ export default async function PrefectureAreaPage({ params }: PageProps) {
       {
         "@type": "BreadcrumbList",
         itemListElement: [
-          { "@type": "ListItem", position: 1, name: "ホーム", item: "https://yadokari.jp" },
-          { "@type": "ListItem", position: 2, name: "エリア一覧", item: "https://yadokari.jp/area" },
-          { "@type": "ListItem", position: 3, name: `${prefecture}の民泊可否ガイド`, item: `https://yadokari.jp/area/${encodeURIComponent(prefecture)}` },
+          { "@type": "ListItem", position: 1, name: "ホーム", item: siteUrl },
+          { "@type": "ListItem", position: 2, name: "エリア一覧", item: `${siteUrl}/area` },
+          { "@type": "ListItem", position: 3, name: `${prefecture}の民泊可否ガイド`, item: `${siteUrl}/area/${encodeURIComponent(prefecture)}` },
         ],
       },
       {

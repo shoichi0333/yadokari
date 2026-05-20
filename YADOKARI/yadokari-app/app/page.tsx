@@ -9,6 +9,9 @@ import MinpakuBadge from "@/components/MinpakuBadge";
 import FeaturedPropertiesTabs from "@/app/FeaturedPropertiesTabs";
 import { BLOG_POSTS } from "@/lib/data/blogPosts";
 import { PROPERTIES } from "@/lib/data/properties";
+import { getSiteUrl } from "@/lib/config";
+
+const siteUrl = getSiteUrl();
 
 export const metadata: Metadata = {
   title: "YADOKARI | 民泊可否チェック・競合分析・収益試算 | 全国対応",
@@ -17,7 +20,7 @@ export const metadata: Metadata = {
     title: "YADOKARI | 民泊可否チェック・競合分析・収益試算",
     description: "住所1つで民泊可否を即判定。競合マップ・収益シミュレーター搭載。全国対応・無料で使えます。",
     type: "website",
-    url: "https://yadokari.jp",
+    url: siteUrl,
   },
   twitter: {
     card: "summary_large_image",
@@ -54,11 +57,11 @@ const siteJsonLd = {
   "@context": "https://schema.org",
   "@type": "WebSite",
   name: "YADOKARI（ヤドカリ）",
-  url: "https://yadokari.jp",
+  url: siteUrl,
   description: "民泊できるエリアを正確に探す。届出データで競合分析・可否チェッカー・収益シミュレーター搭載。",
   potentialAction: {
     "@type": "SearchAction",
-    target: "https://yadokari.jp/check?q={search_term_string}",
+    target: `${siteUrl}/check?q={search_term_string}`,
     "query-input": "required name=search_term_string",
   },
 };

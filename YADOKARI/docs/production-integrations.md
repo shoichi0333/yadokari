@@ -1,6 +1,6 @@
 # Production Integrations
 
-Last updated: 2026-05-17
+Last updated: 2026-05-20
 
 This document lists the external services required for a full YADOKARI production launch.
 
@@ -22,6 +22,34 @@ Output directory:
 
 ```text
 .next
+```
+
+Current production alias:
+
+```text
+https://yadokari-app.vercel.app
+```
+
+Post-deploy status on 2026-05-20:
+
+- Vercel production deployment is `Ready`.
+- `npm run smoke` passes against `https://yadokari-app.vercel.app`.
+- `/api/health` returns `status: "degraded"` because email delivery is not configured.
+- `NEXT_PUBLIC_SITE_URL` is set to `https://yadokari.jp`.
+- Sitemap, robots, OGP, and JSON-LD canonical URLs point to `https://yadokari.jp`.
+- `yadokari.jp` is attached to the Vercel project but DNS is not configured yet.
+
+To activate `yadokari.jp`, set the DNS provider record:
+
+```text
+A yadokari.jp 76.76.21.21
+```
+
+Alternatively, change nameservers to:
+
+```text
+ns1.vercel-dns.com
+ns2.vercel-dns.com
 ```
 
 ## Environment Variables
