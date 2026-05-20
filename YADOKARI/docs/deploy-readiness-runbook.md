@@ -21,14 +21,14 @@ Checks completed:
 - `/api/health` returned `ok: true` and `status: "degraded"`.
 - Health details: `email: false`; site URL, Supabase, database, Stripe, and listings were configured.
 - Latest Vercel deployment was `Ready`.
-- `NEXT_PUBLIC_SITE_URL` is set to `https://yadokari.jp` in Vercel production.
+- `NEXT_PUBLIC_SITE_URL` is set to `https://yadokari-minpaku.jp` in Vercel production.
 - Sitemap, robots, OGP, and JSON-LD URLs are generated from `NEXT_PUBLIC_SITE_URL`.
 
 Remaining launch tasks:
 
 - Configure `RESEND_API_KEY` in Vercel so lead/contact email delivery is active.
 - Confirm `CONTACT_EMAIL` is set in Vercel production.
-- Configure DNS for `yadokari.jp`; Vercel recommends `A yadokari.jp 76.76.21.21`.
+- Configure DNS for `yadokari-minpaku.jp`; Vercel recommends `A yadokari-minpaku.jp 76.76.21.21` and `A www.yadokari-minpaku.jp 76.76.21.21`.
 - Re-run production smoke after DNS propagation and email setup.
 
 ## Predeploy Command
@@ -74,7 +74,7 @@ The app can still build without optional integrations, but paid checkout and ema
 After deploy:
 
 ```text
-https://yadokari.jp/api/health
+https://yadokari-minpaku.jp/api/health
 ```
 
 Expected shape:
@@ -109,7 +109,7 @@ npm run smoke
 Against production:
 
 ```powershell
-$env:SMOKE_BASE_URL="https://yadokari.jp"
+$env:SMOKE_BASE_URL="https://yadokari-minpaku.jp"
 npm run smoke
 ```
 

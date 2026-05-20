@@ -10,9 +10,9 @@
 - Vercel 最新 production deployment は `Ready`。
 - 公開 alias `https://yadokari-app.vercel.app` に対する `npm run smoke` 成功。
 - `/api/health` は `ok: true`, `status: "degraded"`。詳細は `email: false` のみ。
-- `yadokari.jp` は Vercel に紐づいているが、DNS が未設定。Vercel 推奨は `A yadokari.jp 76.76.21.21`。
-- Vercel production の `NEXT_PUBLIC_SITE_URL` を `https://yadokari.jp` に更新し、production 再デプロイ済み。
-- sitemap / robots / OGP / JSON-LD の URL は `https://yadokari.jp` に統一済み。
+- `yadokari-minpaku.jp` と `www.yadokari-minpaku.jp` は Vercel に紐づいているが、DNS が未設定。
+- Vercel production の `NEXT_PUBLIC_SITE_URL` を `https://yadokari-minpaku.jp` に更新し、production 再デプロイ済み。
+- sitemap / robots / OGP / JSON-LD の URL は `https://yadokari-minpaku.jp` に統一済み。
 
 ### 対応
 - `.claude/settings.local.json` から平文トークン・DBパスワードを含む許可エントリを削除。
@@ -21,8 +21,8 @@
 
 ### 残タスク
 1. Vercel production に `RESEND_API_KEY` を設定し、`CONTACT_EMAIL` を確認する。
-2. `yadokari.jp` の DNS を設定する。
-3. DNS とメール設定後に `SMOKE_BASE_URL=https://yadokari.jp npm run smoke` を再実行する。
+2. `yadokari-minpaku.jp` の DNS を設定する。
+3. DNS とメール設定後に `SMOKE_BASE_URL=https://yadokari-minpaku.jp npm run smoke` を再実行する。
 
 ---
 

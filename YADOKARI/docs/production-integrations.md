@@ -35,14 +35,15 @@ Post-deploy status on 2026-05-20:
 - Vercel production deployment is `Ready`.
 - `npm run smoke` passes against `https://yadokari-app.vercel.app`.
 - `/api/health` returns `status: "degraded"` because email delivery is not configured.
-- `NEXT_PUBLIC_SITE_URL` is set to `https://yadokari.jp`.
-- Sitemap, robots, OGP, and JSON-LD canonical URLs point to `https://yadokari.jp`.
-- `yadokari.jp` is attached to the Vercel project but DNS is not configured yet.
+- `NEXT_PUBLIC_SITE_URL` is set to `https://yadokari-minpaku.jp`.
+- Sitemap, robots, OGP, and JSON-LD canonical URLs point to `https://yadokari-minpaku.jp`.
+- `yadokari-minpaku.jp` and `www.yadokari-minpaku.jp` are attached to the Vercel project but DNS is not configured yet.
 
-To activate `yadokari.jp`, set the DNS provider record:
+To activate `yadokari-minpaku.jp`, set these DNS provider records:
 
 ```text
-A yadokari.jp 76.76.21.21
+A yadokari-minpaku.jp 76.76.21.21
+A www.yadokari-minpaku.jp 76.76.21.21
 ```
 
 Alternatively, change nameservers to:
@@ -57,7 +58,7 @@ ns2.vercel-dns.com
 Required for public production:
 
 ```text
-NEXT_PUBLIC_SITE_URL=https://yadokari.jp
+NEXT_PUBLIC_SITE_URL=https://yadokari-minpaku.jp
 ```
 
 Recommended for full product behavior:
@@ -130,7 +131,7 @@ Required values:
 Webhook endpoint:
 
 ```text
-https://yadokari.jp/api/webhook/stripe
+https://yadokari-minpaku.jp/api/webhook/stripe
 ```
 
 Required webhook events:
@@ -167,14 +168,14 @@ After all variables are set:
 
 ```powershell
 npm run predeploy
-$env:SMOKE_BASE_URL="https://yadokari.jp"
+$env:SMOKE_BASE_URL="https://yadokari-minpaku.jp"
 npm run smoke
 ```
 
 Then open:
 
 ```text
-https://yadokari.jp/api/health
+https://yadokari-minpaku.jp/api/health
 ```
 
 Expected production status:

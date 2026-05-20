@@ -18,7 +18,7 @@
 
 | 変数 | 用途 | 未設定時 |
 | --- | --- | --- |
-| `NEXT_PUBLIC_SITE_URL` | canonical/外部URL生成 | `https://yadokari.jp` 前提の箇所あり |
+| `NEXT_PUBLIC_SITE_URL` | canonical/外部URL生成 | `https://yadokari-minpaku.jp` 前提の箇所あり |
 
 ### DB・認証
 
