@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          from: "YADOKARI <noreply@yadokari.jp>",
+          from: "YADOKARI <noreply@yadokari-minpaku.jp>",
           to: [contactEmail],
           subject: `新規リード: ${email}`,
           html: `<p>メール: ${email}</p><p>チェックしたエリア: ${address ?? "不明"}</p>`,

@@ -24,29 +24,21 @@ Output directory:
 .next
 ```
 
-Current production alias:
+Current production domain:
 
 ```text
-https://yadokari-app.vercel.app
+https://yadokari-minpaku.jp
 ```
 
-Post-deploy status on 2026-05-20:
+Post-deploy status on 2026-05-21:
 
 - Vercel production deployment is `Ready`.
-- `npm run smoke` passes against `https://yadokari-app.vercel.app`.
+- `npm run smoke` passes against `https://yadokari-minpaku.jp`.
 - `/api/health` returns `status: "degraded"` because email delivery is not configured.
 - `NEXT_PUBLIC_SITE_URL` is set to `https://yadokari-minpaku.jp`.
 - Sitemap, robots, OGP, and JSON-LD canonical URLs point to `https://yadokari-minpaku.jp`.
-- `yadokari-minpaku.jp` and `www.yadokari-minpaku.jp` are attached to the Vercel project but DNS is not configured yet.
-
-To activate `yadokari-minpaku.jp`, set these DNS provider records:
-
-```text
-A yadokari-minpaku.jp 76.76.21.21
-A www.yadokari-minpaku.jp 76.76.21.21
-```
-
-Alternatively, change nameservers to:
+- `yadokari-minpaku.jp` and `www.yadokari-minpaku.jp` are attached to the Vercel project.
+- Nameservers are configured through Vercel DNS:
 
 ```text
 ns1.vercel-dns.com
@@ -161,6 +153,12 @@ Required values:
 - `CONTACT_EMAIL`
 
 Without these values, the app returns success for local/demo flows and logs fallback messages.
+
+Current production status:
+
+- `CONTACT_EMAIL` is configured.
+- `RESEND_API_KEY` is not configured.
+- App sender addresses use `noreply@yadokari-minpaku.jp`.
 
 ## Post-Setup Verification
 

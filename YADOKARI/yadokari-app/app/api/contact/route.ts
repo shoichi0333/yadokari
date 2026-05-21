@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: "YADOKARI <noreply@yadokari.jp>",
+        from: "YADOKARI <noreply@yadokari-minpaku.jp>",
         to: [contactEmail],
         subject: `YADOKARIお問い合わせ: ${subject}`,
         html: [
