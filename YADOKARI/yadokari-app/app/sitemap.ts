@@ -1,7 +1,6 @@
 import { MetadataRoute } from "next";
 import { WARD_ZONING_MAP } from "@/lib/data/wardZoning";
 import { BLOG_POSTS } from "@/lib/data/blogPosts";
-import { PROPERTIES } from "@/lib/data/properties";
 import { getSiteUrl } from "@/lib/config";
 
 const BASE_URL = getSiteUrl();
@@ -45,12 +44,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.7,
   }));
 
-  const propertyPages: MetadataRoute.Sitemap = PROPERTIES.map((p) => ({
-    url: `${BASE_URL}/property/${p.id}`,
-    lastModified: new Date(),
-    changeFrequency: "weekly" as const,
-    priority: 0.7,
-  }));
-
-  return [...staticPages, ...areaPages, ...wardPages, ...blogPages, ...propertyPages];
+  return [...staticPages, ...areaPages, ...wardPages, ...blogPages];
 }

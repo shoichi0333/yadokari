@@ -6,9 +6,7 @@ import Image from "next/image";
 import { ArrowRight, TrendingUp, Shield, MapPin, CheckCircle2, Database, BookOpen, Clock, User, Building2, Briefcase } from "lucide-react";
 import SearchForm from "@/components/SearchForm";
 import MinpakuBadge from "@/components/MinpakuBadge";
-import FeaturedPropertiesTabs from "@/app/FeaturedPropertiesTabs";
 import { BLOG_POSTS } from "@/lib/data/blogPosts";
-import { PROPERTIES } from "@/lib/data/properties";
 import { getSiteUrl } from "@/lib/config";
 
 const siteUrl = getSiteUrl();
@@ -399,7 +397,30 @@ export default function TopPage() {
               全件を見る <ArrowRight size={14} />
             </Link>
           </div>
-          <FeaturedPropertiesTabs properties={PROPERTIES} />
+          <div className="rounded-2xl border border-dashed border-teal-200 bg-white px-6 py-10 text-center">
+            <Building2 size={36} className="mx-auto mb-4 text-teal-600" />
+            <h3 className="text-lg font-bold text-gray-900">掲載物件は審査済みデータへ切り替え中です</h3>
+            <p className="mx-auto mt-3 max-w-2xl text-sm leading-6 text-gray-600">
+              本番公開後に架空物件や古いシードデータが表示されないよう、物件カードの公開を一時停止しています。
+              民泊可否チェック、詳細レポート、競合マップはそのまま利用できます。
+            </p>
+            <div className="mt-6 flex flex-wrap justify-center gap-3">
+              <Link
+                href="/submit-property"
+                className="inline-flex items-center gap-2 rounded-full bg-teal-600 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-teal-700"
+              >
+                物件掲載を申請する
+                <ArrowRight size={14} />
+              </Link>
+              <Link
+                href="/map"
+                className="inline-flex items-center gap-2 rounded-full border border-teal-200 bg-white px-5 py-2.5 text-sm font-semibold text-teal-700 transition-colors hover:bg-teal-50"
+              >
+                競合マップを見る
+                <ArrowRight size={14} />
+              </Link>
+            </div>
+          </div>
         </div>
       </section>
 

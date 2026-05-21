@@ -2,7 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import type { ReactNode } from "react";
 import { MapPin, Train, Maximize2, Building2, Calendar } from "lucide-react";
-import { Property } from "@/lib/data/properties";
+import type { Property } from "@/lib/data/properties";
 import MinpakuBadge from "./MinpakuBadge";
 import FavoriteButton from "./FavoriteButton";
 

@@ -65,7 +65,10 @@ STRIPE_PRO_PRICE_ID=
 STRIPE_WEBHOOK_SECRET=
 RESEND_API_KEY=
 CONTACT_EMAIL=
+NEXT_PUBLIC_PROPERTY_MARKETPLACE_ENABLED=false
 ```
+
+Keep `NEXT_PUBLIC_PROPERTY_MARKETPLACE_ENABLED=false` in production until listings are reviewed and ready for publication. When false, `/properties` shows a preparation page, `/api/properties` returns an empty list, property detail pages redirect to `/properties`, and individual property URLs are omitted from the sitemap.
 
 ## Supabase
 

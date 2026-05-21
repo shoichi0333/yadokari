@@ -1,8 +1,13 @@
 import { NextResponse } from "next/server";
 import { getPropertyById } from "@/lib/properties-service";
+import { isPropertyMarketplaceEnabled } from "@/lib/property-marketplace";
 
 export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
+    if (!isPropertyMarketplaceEnabled()) {
+      return NextResponse.json({ error: "Property marketplace is not published yet" }, { status: 404 });
+    }
+
     const { id } = await params;
     const property = await getPropertyById(id);
 

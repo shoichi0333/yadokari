@@ -5,6 +5,7 @@ import {
   type Property,
 } from "@/lib/data/properties";
 import { getMinpakuBadgeType, getMinpakuInfo, type MinpakuType } from "@/lib/minpaku";
+import { isPropertyMarketplaceEnabled } from "@/lib/property-marketplace";
 
 export interface SearchParams {
   prefecture?: string;
@@ -145,6 +146,10 @@ function buildWhere(params: SearchParams): PropertyWhereInput {
 
 export async function getProperties(params: SearchParams = {}): Promise<Property[]> {
   if (!isDatabaseAvailable()) {
+    if (process.env.NODE_ENV === "production" || !isPropertyMarketplaceEnabled()) {
+      return [];
+    }
+
     return mockSearch({
       ...params,
       minpakuType: params.minpakuType as MinpakuType | "ALL" | undefined,
@@ -170,6 +175,10 @@ export async function getProperties(params: SearchParams = {}): Promise<Property
 
 export async function getPropertyById(id: string): Promise<Property | undefined> {
   if (!isDatabaseAvailable()) {
+    if (process.env.NODE_ENV === "production" || !isPropertyMarketplaceEnabled()) {
+      return undefined;
+    }
+
     return mockGetById(id);
   }
 

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getProperties } from "@/lib/properties-service";
 import type { SearchParams } from "@/lib/properties-service";
+import { isPropertyMarketplaceEnabled } from "@/lib/property-marketplace";
 
 const MINPAKU_TYPES = ["ALL", "JUUTAKU", "TOKKU", "RYOKAN", "NG"] as const;
 
@@ -28,6 +29,10 @@ function getMinpakuTypeParam(searchParams: URLSearchParams): SearchParams["minpa
 
 export async function GET(request: NextRequest) {
   try {
+    if (!isPropertyMarketplaceEnabled()) {
+      return NextResponse.json([]);
+    }
+
     const searchParams = request.nextUrl.searchParams;
     const tags = searchParams.getAll("tags").map((tag) => tag.trim()).filter(Boolean);
     const query: SearchParams = {

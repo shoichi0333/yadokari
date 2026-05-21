@@ -3,7 +3,23 @@
 import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Search, SlidersHorizontal } from "lucide-react";
-import { PREFECTURES, LAYOUTS } from "@/lib/data/properties";
+
+const PREFECTURES = [
+  "ALL",
+  "北海道",
+  "東京都",
+  "神奈川県",
+  "千葉県",
+  "埼玉県",
+  "愛知県",
+  "京都府",
+  "大阪府",
+  "兵庫県",
+  "福岡県",
+  "沖縄県",
+];
+
+const LAYOUTS = ["ALL", "1K", "1DK", "1LDK", "2DK", "2LDK", "3LDK", "4LDK以上"];
 
 interface SearchParams {
   keyword: string;
