@@ -34,7 +34,7 @@ Post-deploy status on 2026-05-21:
 
 - Vercel production deployment is `Ready`.
 - `npm run smoke` passes against `https://yadokari-minpaku.jp`.
-- `/api/health` returns `status: "degraded"` because email delivery is not configured.
+- `/api/health` returns `status: "ok"`.
 - `NEXT_PUBLIC_SITE_URL` is set to `https://yadokari-minpaku.jp`.
 - Sitemap, robots, OGP, and JSON-LD canonical URLs point to `https://yadokari-minpaku.jp`.
 - `yadokari-minpaku.jp` and `www.yadokari-minpaku.jp` are attached to the Vercel project.
@@ -157,7 +157,8 @@ Without these values, the app returns success for local/demo flows and logs fall
 Current production status:
 
 - `CONTACT_EMAIL` is configured.
-- `RESEND_API_KEY` is not configured.
+- `RESEND_API_KEY` is configured.
+- `yadokari-minpaku.jp` is verified in Resend.
 - App sender addresses use `noreply@yadokari-minpaku.jp`.
 
 ## Post-Setup Verification
