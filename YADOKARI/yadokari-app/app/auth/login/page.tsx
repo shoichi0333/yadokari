@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, MailCheck } from "lucide-react";
 import { login } from "@/lib/auth";
 import { useAuth } from "@/lib/AuthContext";
 
@@ -15,6 +15,13 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [showPass, setShowPass] = useState(false);
   const [error, setError] = useState("");
+  const [notice] = useState(() => {
+    if (typeof window === "undefined") return "";
+    const params = new URLSearchParams(window.location.search);
+    return params.get("registered") === "1"
+      ? "メール確認が完了しました。登録したメールアドレスとパスワードでログインしてください。"
+      : "";
+  });
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -22,23 +29,22 @@ export default function LoginPage() {
     setError("");
     setLoading(true);
     try {
-      await new Promise((r) => setTimeout(r, 400));
       const user = await login(email, password);
       if (!user) {
-        setError("メールアドレスまたはパスワードが正しくありません");
+        setError("メールアドレスまたはパスワードが正しくありません。確認メールが未完了の場合は、先にメール内のリンクを開いてください。");
         return;
       }
       await refresh();
       router.push("/");
     } catch {
-      setError("メールアドレスまたはパスワードが正しくありません");
+      setError("メールアドレスまたはパスワードが正しくありません。");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-8">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center justify-center mb-4">
@@ -49,11 +55,16 @@ export default function LoginPage() {
         </div>
 
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8">
+          {notice && (
+            <div className="mb-5 flex gap-3 rounded-xl border border-teal-100 bg-teal-50 px-4 py-3 text-sm leading-6 text-teal-800">
+              <MailCheck size={18} className="mt-0.5 flex-shrink-0 text-teal-600" />
+              <p>{notice}</p>
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                メールアドレス
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">メールアドレス</label>
               <input
                 type="email"
                 required
@@ -65,9 +76,7 @@ export default function LoginPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                パスワード
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">パスワード</label>
               <div className="relative">
                 <input
                   type={showPass ? "text" : "password"}
@@ -81,6 +90,7 @@ export default function LoginPage() {
                   type="button"
                   onClick={() => setShowPass(!showPass)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  aria-label={showPass ? "パスワードを隠す" : "パスワードを表示"}
                 >
                   {showPass ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>

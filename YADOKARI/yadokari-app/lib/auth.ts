@@ -73,7 +73,13 @@ export async function register(
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
-      options: { data: { name } },
+      options: {
+        data: { name },
+        emailRedirectTo:
+          typeof window !== "undefined"
+            ? `${window.location.origin}/auth/login?registered=1`
+            : undefined,
+      },
     });
     if (error || !data.user) return null;
 
