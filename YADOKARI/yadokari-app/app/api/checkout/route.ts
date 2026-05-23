@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
-import { getExpectedStripePriceId, isAllowedAppUrl } from "@/lib/config";
+import { cleanEnvValue, getExpectedStripePriceId, isAllowedAppUrl } from "@/lib/config";
 
 type CheckoutRequestBody = {
   priceId?: string;
@@ -11,7 +11,7 @@ type CheckoutRequestBody = {
 };
 
 export async function POST(request: NextRequest) {
-  const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+  const stripeSecretKey = cleanEnvValue(process.env.STRIPE_SECRET_KEY);
 
   if (!stripeSecretKey) {
     return NextResponse.json(
@@ -28,7 +28,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
   }
 
-  const { priceId, planType, successUrl, cancelUrl, email } = body;
+  const { planType, successUrl, cancelUrl, email } = body;
+  const priceId = cleanEnvValue(body.priceId);
 
   if (!priceId || !planType || !successUrl || !cancelUrl) {
     return NextResponse.json(
@@ -65,7 +66,8 @@ export async function POST(request: NextRequest) {
     });
 
     return NextResponse.json({ url: session.url });
-  } catch {
+  } catch (error) {
+    console.error("Failed to create Stripe checkout session:", error);
     return NextResponse.json({ error: "Failed to create checkout session" }, { status: 500 });
   }
 }

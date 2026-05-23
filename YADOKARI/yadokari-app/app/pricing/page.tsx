@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import PricingClient from "./PricingClient";
+import { cleanEnvValue } from "@/lib/config";
 
 export const metadata: Metadata = {
   title: "料金プラン | YADOKARI",
@@ -17,8 +18,10 @@ export default function PricingPage() {
     process.env.STRIPE_PUBLISHABLE_KEY ?? process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
   );
   const secretKeyAvailable = Boolean(process.env.STRIPE_SECRET_KEY);
-  const standardPriceId = process.env.STRIPE_STANDARD_PRICE_ID ?? process.env.NEXT_PUBLIC_STRIPE_STANDARD_PRICE_ID;
-  const proPriceId = process.env.STRIPE_PRO_PRICE_ID ?? process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID;
+  const standardPriceId = cleanEnvValue(
+    process.env.STRIPE_STANDARD_PRICE_ID ?? process.env.NEXT_PUBLIC_STRIPE_STANDARD_PRICE_ID
+  );
+  const proPriceId = cleanEnvValue(process.env.STRIPE_PRO_PRICE_ID ?? process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID);
 
   return (
     <Suspense>
