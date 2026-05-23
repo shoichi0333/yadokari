@@ -243,6 +243,8 @@ cd YADOKARI\yadokari-app
 @"
 SUPABASE_ACCESS_TOKEN=...
 RESEND_API_KEY=...
+SUPABASE_SITE_URL=https://yadokari-minpaku.jp
+SUPABASE_REDIRECT_URLS=https://yadokari-minpaku.jp,https://yadokari-minpaku.jp/**,https://yadokari-minpaku.jp/auth/login,https://yadokari-minpaku.jp/auth/login?registered=1
 SMTP_ADMIN_EMAIL=noreply@yadokari-minpaku.jp
 SMTP_SENDER_NAME=YADOKARI
 SUPABASE_RATE_LIMIT_EMAIL_SENT=30
@@ -256,7 +258,7 @@ Remove-Item .env.smtp.local
 
 `SUPABASE_RATE_LIMIT_EMAIL_SENT` controls the project-wide hourly limit for Auth endpoints that send email. Supabase's custom SMTP default is low to protect sender reputation, so start at `30` and raise carefully only after deliverability is stable.
 
-After SMTP is already configured, `RESEND_API_KEY` can be omitted to update only `SUPABASE_RATE_LIMIT_EMAIL_SENT`.
+After SMTP is already configured, `RESEND_API_KEY` can be omitted to update only `SUPABASE_RATE_LIMIT_EMAIL_SENT`, `SUPABASE_SITE_URL`, and `SUPABASE_REDIRECT_URLS`.
 
 ## Post-Setup Verification
 

@@ -62,12 +62,25 @@ async function main() {
   const senderEmail = env.SMTP_ADMIN_EMAIL || "noreply@yadokari-minpaku.jp";
   const senderName = env.SMTP_SENDER_NAME || "YADOKARI";
   const smtpPort = env.SMTP_PORT || "465";
+  const siteUrl = env.SUPABASE_SITE_URL || env.NEXT_PUBLIC_SITE_URL || "https://yadokari-minpaku.jp";
+  const redirectUrls =
+    env.SUPABASE_REDIRECT_URLS ||
+    [
+      "https://yadokari-minpaku.jp",
+      "https://yadokari-minpaku.jp/**",
+      "https://yadokari-minpaku.jp/auth/login",
+      "https://yadokari-minpaku.jp/auth/login?registered=1",
+    ].join(",");
 
   const body: Record<string, string | number | boolean> = {
+    site_url: siteUrl,
+    uri_allow_list: redirectUrls,
     rate_limit_email_sent: Number(env.SUPABASE_RATE_LIMIT_EMAIL_SENT || "30"),
   };
 
   console.log(`Configuring Supabase Auth SMTP for project ${projectRef}`);
+  console.log(`Site URL: ${body.site_url}`);
+  console.log(`Redirect URLs: ${body.uri_allow_list}`);
   console.log(`Auth email rate limit: ${body.rate_limit_email_sent} per hour`);
 
   if (resendApiKey) {
