@@ -165,6 +165,12 @@ Required values:
 - `STRIPE_PRO_PRICE_ID`
 - `STRIPE_WEBHOOK_SECRET`
 
+Production status:
+
+- Live Stripe keys and live monthly prices are configured in Vercel Production.
+- Live Checkout Session creation has been verified with a `cs_live_...` session.
+- Before active sales, complete one small live payment and refund check and verify the webhook updates the subscription state.
+
 Webhook endpoint:
 
 ```text

@@ -21,6 +21,8 @@ Checks completed:
 - Search Console ownership is verified with DNS TXT.
 - Search Console URL inspection showed the top page is indexed and served over HTTPS.
 - Resend domain authentication and production contact email delivery are configured.
+- Stripe live keys, live prices, and production webhook are configured in Vercel Production.
+- Stripe live Checkout Session creation has been verified; final live payment/refund smoke remains a manual finance check.
 - The mock property marketplace is gated with `NEXT_PUBLIC_PROPERTY_MARKETPLACE_ENABLED=false`.
 - `/properties` and individual `/property/*` mock URLs are omitted from the sitemap while the marketplace is gated.
 - Daily Codex health monitoring is scheduled for 09:00 JST and should notify only on failures.
@@ -30,7 +32,7 @@ Remaining launch tasks:
 
 - Submit `https://yadokari-minpaku.jp/sitemap.xml` in Google Search Console if it has not been submitted from the UI.
 - Create or confirm a GA4 web data stream, then set `NEXT_PUBLIC_GA_MEASUREMENT_ID` in Vercel Production and redeploy.
-- Run a small live Stripe purchase/refund check before actively selling paid reports.
+- Run a small live Stripe purchase/refund check before actively selling paid reports, then confirm the webhook updates the subscription record.
 - Rotate any secrets that were ever pasted into files, docs, screenshots, or chat.
 - Keep the mock marketplace gated until real listings are reviewed and ready for publication.
 - Confirm Supabase backup/PITR settings for the production database.
