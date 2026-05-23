@@ -3,6 +3,7 @@ import Link from "next/link";
 import "./globals.css";
 import Header from "@/components/Header";
 import BottomNav from "@/components/BottomNav";
+import GoogleAnalytics from "@/components/GoogleAnalytics";
 import { AuthProvider } from "@/lib/AuthContext";
 import { ToastProvider } from "@/lib/ToastContext";
 import { getSiteUrl } from "@/lib/config";
@@ -44,6 +45,7 @@ export default function RootLayout({
   return (
     <html lang="ja" className="h-full">
       <body className="min-h-full flex flex-col bg-gray-50">
+        <GoogleAnalytics measurementId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID} />
         <AuthProvider>
         <ToastProvider>
           <Header />

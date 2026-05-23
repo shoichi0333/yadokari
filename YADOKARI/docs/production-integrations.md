@@ -63,12 +63,29 @@ STRIPE_SECRET_KEY=
 STRIPE_STANDARD_PRICE_ID=
 STRIPE_PRO_PRICE_ID=
 STRIPE_WEBHOOK_SECRET=
+NEXT_PUBLIC_GA_MEASUREMENT_ID=
 RESEND_API_KEY=
 CONTACT_EMAIL=
 NEXT_PUBLIC_PROPERTY_MARKETPLACE_ENABLED=false
 ```
 
 Keep `NEXT_PUBLIC_PROPERTY_MARKETPLACE_ENABLED=false` in production until listings are reviewed and ready for publication. When false, `/properties` shows a preparation page, `/api/properties` returns an empty list, property detail pages redirect to `/properties`, and individual property URLs are omitted from the sitemap.
+
+## Google Search Console and Analytics
+
+Search Console:
+
+- Domain property verification is configured through a DNS TXT record on `yadokari-minpaku.jp`.
+- Submit sitemap:
+
+```text
+https://yadokari-minpaku.jp/sitemap.xml
+```
+
+Google Analytics:
+
+- Set `NEXT_PUBLIC_GA_MEASUREMENT_ID` in Vercel Production to enable GA4 tracking.
+- The app loads GA4 only when the measurement ID is present.
 
 ## Supabase
 
