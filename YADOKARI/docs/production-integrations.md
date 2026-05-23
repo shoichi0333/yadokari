@@ -87,6 +87,31 @@ Google Analytics:
 - Set `NEXT_PUBLIC_GA_MEASUREMENT_ID` in Vercel Production to enable GA4 tracking.
 - The app loads GA4 only when the measurement ID is present.
 
+## Production Operations
+
+Health monitoring:
+
+- Daily Codex health monitoring should check `/api/health` and the top page.
+- Notify only when HTTPS fails, `/api/health` is not `status: "ok"`, or the top page is unreachable.
+- After every deploy, run `npm run smoke` with `SMOKE_BASE_URL=https://yadokari-minpaku.jp`.
+
+Backups:
+
+- Confirm Supabase daily backups or PITR for the production project before storing irreplaceable customer data.
+- Before schema changes, run `npm run db:migrate` against a reviewed migration and verify `/api/health` afterward.
+- Keep `public/data/minpaku_listings.json` source updates in git so listing-map data can be restored from history.
+
+Secret rotation:
+
+- Rotate any key that has appeared in a local file, screenshot, chat, or temporary setup note.
+- Rotate in this order when possible: create the new provider key, add it to Vercel Production, redeploy, verify health/smoke, then revoke the old key.
+- High-priority secrets: `RESEND_API_KEY`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `DATABASE_URL`, `DIRECT_URL`, and Supabase service credentials.
+
+Property marketplace gate:
+
+- Keep `NEXT_PUBLIC_PROPERTY_MARKETPLACE_ENABLED=false` until the displayed listings are real, reviewed, and approved for publication.
+- When enabling the marketplace, re-add intended listing URLs to the sitemap only after the content is production-ready.
+
 ## Supabase
 
 Purpose:

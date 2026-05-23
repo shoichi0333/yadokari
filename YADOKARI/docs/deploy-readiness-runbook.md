@@ -1,10 +1,39 @@
 # YADOKARI Deploy Readiness Runbook
 
-Last updated: 2026-05-20
+Last updated: 2026-05-23
 
 ## Goal
 
 Bring the app to a deployable state with repeatable checks, safe fallbacks, and post-deploy visibility.
+
+## 2026-05-23 Production Snapshot
+
+Verified production:
+
+```text
+https://yadokari-minpaku.jp
+```
+
+Checks completed:
+
+- Production `/api/health` returned `ok: true` and `status: "ok"`.
+- Production smoke test passed against `https://yadokari-minpaku.jp`.
+- Search Console ownership is verified with DNS TXT.
+- Search Console URL inspection showed the top page is indexed and served over HTTPS.
+- Resend domain authentication and production contact email delivery are configured.
+- The mock property marketplace is gated with `NEXT_PUBLIC_PROPERTY_MARKETPLACE_ENABLED=false`.
+- `/properties` and individual `/property/*` mock URLs are omitted from the sitemap while the marketplace is gated.
+- Daily Codex health monitoring is scheduled for 09:00 JST and should notify only on failures.
+- GA4 code support is deployed, but tracking stays disabled until `NEXT_PUBLIC_GA_MEASUREMENT_ID` is set.
+
+Remaining launch tasks:
+
+- Submit `https://yadokari-minpaku.jp/sitemap.xml` in Google Search Console if it has not been submitted from the UI.
+- Create or confirm a GA4 web data stream, then set `NEXT_PUBLIC_GA_MEASUREMENT_ID` in Vercel Production and redeploy.
+- Run a small live Stripe purchase/refund check before actively selling paid reports.
+- Rotate any secrets that were ever pasted into files, docs, screenshots, or chat.
+- Keep the mock marketplace gated until real listings are reviewed and ready for publication.
+- Confirm Supabase backup/PITR settings for the production database.
 
 ## 2026-05-20 Post-Deploy Snapshot
 

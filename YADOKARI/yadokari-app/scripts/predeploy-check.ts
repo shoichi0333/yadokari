@@ -54,6 +54,11 @@ const envChecks: EnvCheck[] = [
     description: "Stripe webhook signing secret.",
   },
   {
+    key: "NEXT_PUBLIC_GA_MEASUREMENT_ID",
+    required: false,
+    description: "Google Analytics 4 measurement id, such as G-XXXXXXXXXX.",
+  },
+  {
     key: "RESEND_API_KEY",
     required: false,
     description: "Resend API key for contact and lead emails.",
@@ -62,6 +67,11 @@ const envChecks: EnvCheck[] = [
     key: "CONTACT_EMAIL",
     required: false,
     description: "Destination email for contact forms and lead notifications.",
+  },
+  {
+    key: "NEXT_PUBLIC_PROPERTY_MARKETPLACE_ENABLED",
+    required: false,
+    description: "Set to true only after real property listings are reviewed for publication.",
   },
 ];
 
@@ -128,6 +138,8 @@ const checkoutReady =
 const emailReady = hasValue("RESEND_API_KEY") && hasValue("CONTACT_EMAIL");
 const databaseReady = hasValue("DATABASE_URL");
 const supabaseReady = hasValue("NEXT_PUBLIC_SUPABASE_URL") && hasValue("NEXT_PUBLIC_SUPABASE_ANON_KEY");
+const analyticsReady = hasValue("NEXT_PUBLIC_GA_MEASUREMENT_ID");
+const marketplaceEnabled = process.env.NEXT_PUBLIC_PROPERTY_MARKETPLACE_ENABLED === "true";
 
 console.log("YADOKARI predeploy check");
 console.log("=========================");
@@ -138,6 +150,8 @@ console.log(`Supabase: ${supabaseReady ? "configured" : "not configured"}`);
 console.log(`Database: ${databaseReady ? "configured" : "not configured"}`);
 console.log(`Stripe checkout: ${checkoutReady ? "configured" : "not configured"}`);
 console.log(`Email delivery: ${emailReady ? "configured" : "fallback logging"}`);
+console.log(`Analytics: ${analyticsReady ? "configured" : "not configured"}`);
+console.log(`Property marketplace: ${marketplaceEnabled ? "enabled" : "gated"}`);
 
 if (optionalMissing.length > 0) {
   console.log("");
