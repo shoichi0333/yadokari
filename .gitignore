@@ -1,7 +1,14 @@
 # Secrets / API keys
+**/.env
+**/.env.*
+!**/.env.local.example
+*.pem
+*.key
 YADOKARI/docs/codex_API.txt
 YADOKARI/docs/yadokari-github-token.txt
 YADOKARI/docs/resendAPI.txt
+YADOKARI/docs/*API*.txt
+YADOKARI/docs/*token*.txt
 
 # Claude Code local settings
 .claude/settings.local.json
