@@ -72,7 +72,7 @@ export async function POST(request: Request) {
       data: {
         name,
       },
-      emailRedirectTo: `${siteUrl}/auth/login?registered=1`,
+      emailRedirectTo: `${siteUrl}/auth/complete`,
     },
   });
 

@@ -244,7 +244,7 @@ cd YADOKARI\yadokari-app
 SUPABASE_ACCESS_TOKEN=...
 RESEND_API_KEY=...
 SUPABASE_SITE_URL=https://yadokari-minpaku.jp
-SUPABASE_REDIRECT_URLS=https://yadokari-minpaku.jp,https://yadokari-minpaku.jp/**,https://yadokari-minpaku.jp/auth/login,https://yadokari-minpaku.jp/auth/login?registered=1
+SUPABASE_REDIRECT_URLS=https://yadokari-minpaku.jp,https://yadokari-minpaku.jp/**,https://yadokari-minpaku.jp/auth/complete,https://yadokari-minpaku.jp/auth/login,https://yadokari-minpaku.jp/auth/login?registered=1
 SMTP_ADMIN_EMAIL=noreply@yadokari-minpaku.jp
 SMTP_SENDER_NAME=YADOKARI
 SUPABASE_RATE_LIMIT_EMAIL_SENT=30

@@ -53,6 +53,8 @@ const MAX_RENT_OPTIONS = [
 ];
 
 const SPECIAL_TAGS = ["ペット可", "駐車場付き", "大人数対応（6名+）", "Wi-Fi完備"];
+const SELECT_CLASS =
+  "border border-gray-200 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-teal-500 [&>option]:bg-white [&>option]:text-gray-900";
 
 export default function SearchForm({ defaultValues = {}, onSearch, compact = false }: Props) {
   const router = useRouter();
@@ -107,10 +109,10 @@ export default function SearchForm({ defaultValues = {}, onSearch, compact = fal
           <select
             value={params.prefecture}
             onChange={(e) => update("prefecture", e.target.value)}
-            className="hidden sm:block px-3 py-3 border border-gray-200 rounded-xl text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white min-w-[120px]"
+            className={`hidden min-w-[120px] rounded-xl px-3 py-3 text-sm sm:block ${SELECT_CLASS}`}
           >
             {PREFECTURES.map((pref) => (
-              <option key={pref} value={pref}>
+              <option key={pref} value={pref} className="bg-white text-gray-900">
                 {pref === "ALL" ? "全都道府県" : pref}
               </option>
             ))}
@@ -164,10 +166,10 @@ export default function SearchForm({ defaultValues = {}, onSearch, compact = fal
                 <select
                   value={params.prefecture}
                   onChange={(e) => update("prefecture", e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white"
+                  className={`w-full rounded-lg px-3 py-2 text-sm ${SELECT_CLASS}`}
                 >
                   {PREFECTURES.map((pref) => (
-                    <option key={pref} value={pref}>
+                    <option key={pref} value={pref} className="bg-white text-gray-900">
                       {pref === "ALL" ? "全都道府県" : pref}
                     </option>
                   ))}
@@ -178,10 +180,10 @@ export default function SearchForm({ defaultValues = {}, onSearch, compact = fal
                 <select
                   value={params.layout}
                   onChange={(e) => update("layout", e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white"
+                  className={`w-full rounded-lg px-3 py-2 text-sm ${SELECT_CLASS}`}
                 >
                   {LAYOUTS.map((l) => (
-                    <option key={l} value={l}>
+                    <option key={l} value={l} className="bg-white text-gray-900">
                       {l === "ALL" ? "すべての間取り" : l}
                     </option>
                   ))}
@@ -192,10 +194,10 @@ export default function SearchForm({ defaultValues = {}, onSearch, compact = fal
                 <select
                   value={params.maxRent}
                   onChange={(e) => update("maxRent", e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white"
+                  className={`w-full rounded-lg px-3 py-2 text-sm ${SELECT_CLASS}`}
                 >
                   {MAX_RENT_OPTIONS.map((o) => (
-                    <option key={o.value} value={o.value}>
+                    <option key={o.value} value={o.value} className="bg-white text-gray-900">
                       {o.label}
                     </option>
                   ))}

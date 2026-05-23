@@ -68,6 +68,7 @@ async function main() {
     [
       "https://yadokari-minpaku.jp",
       "https://yadokari-minpaku.jp/**",
+      "https://yadokari-minpaku.jp/auth/complete",
       "https://yadokari-minpaku.jp/auth/login",
       "https://yadokari-minpaku.jp/auth/login?registered=1",
     ].join(",");
