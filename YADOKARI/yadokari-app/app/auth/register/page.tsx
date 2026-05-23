@@ -39,7 +39,7 @@ export default function RegisterPage() {
     try {
       const user = await register(email, password, name);
       if (!user) {
-        setError("登録に失敗しました。入力内容を確認してください。");
+        setError("登録を完了できませんでした。すでに登録済みの場合はログインしてください。");
         return;
       }
 

@@ -63,7 +63,7 @@ function getRegisterErrorMessage(message: string): string {
 export async function login(email: string, password: string): Promise<AuthUser | null> {
   if (isSupabaseEnabled()) {
     const supabase = getSupabaseClient();
-    if (!supabase) return null;
+    if (!supabase) throw new Error("認証サービスに接続できませんでした。時間をおいて再度お試しください。");
 
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     if (error || !data.user) return null;
@@ -104,7 +104,9 @@ export async function register(
       },
     });
     if (error) throw new Error(getRegisterErrorMessage(error.message));
-    if (!data.user) return null;
+    if (!data.user) {
+      throw new Error("登録を完了できませんでした。すでに登録済みの場合はログインしてください。");
+    }
     if (Array.isArray(data.user.identities) && data.user.identities.length === 0) {
       throw new Error("このメールアドレスはすでに登録されています。ログインしてください。");
     }
