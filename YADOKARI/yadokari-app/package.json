@@ -10,6 +10,7 @@
     "typecheck": "tsc --noEmit",
     "predeploy": "npm run lint && npm run typecheck && tsx scripts/predeploy-check.ts && npm run build",
     "smoke": "tsx scripts/smoke-test.ts",
+    "auth:smtp": "tsx scripts/configure-supabase-smtp.ts",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate deploy",
     "db:seed": "tsx prisma/seed.ts",

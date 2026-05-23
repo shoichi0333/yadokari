@@ -197,6 +197,7 @@ Purpose:
 
 - contact form delivery
 - lead capture notifications
+- Supabase Auth transactional email SMTP, after `auth:smtp` is configured
 
 Required values:
 
@@ -211,6 +212,46 @@ Current production status:
 - `RESEND_API_KEY` is configured.
 - `yadokari-minpaku.jp` is verified in Resend.
 - App sender addresses use `noreply@yadokari-minpaku.jp`.
+
+## Supabase Auth SMTP
+
+Purpose:
+
+- account confirmation emails
+- password reset emails
+- email change confirmations
+
+Supabase's default Auth email sender is not production-ready and can hit strict message limits. Configure a custom SMTP sender using Resend.
+
+Recommended SMTP settings:
+
+```text
+Host: smtp.resend.com
+Port: 465
+Username: resend
+Password: RESEND_API_KEY
+Sender email: noreply@yadokari-minpaku.jp
+Sender name: YADOKARI
+```
+
+Automation script:
+
+```powershell
+cd YADOKARI\yadokari-app
+
+# .env.smtp.local is ignored by git.
+@"
+SUPABASE_ACCESS_TOKEN=...
+RESEND_API_KEY=...
+SMTP_ADMIN_EMAIL=noreply@yadokari-minpaku.jp
+SMTP_SENDER_NAME=YADOKARI
+"@ | Set-Content -Encoding utf8 .env.smtp.local
+
+npm run auth:smtp
+Remove-Item .env.smtp.local
+```
+
+`SUPABASE_ACCESS_TOKEN` is a Supabase dashboard personal access token with permission to update the project auth config. `NEXT_PUBLIC_SUPABASE_URL` is read from `.env.local`, or `SUPABASE_PROJECT_REF` can be set explicitly.
 
 ## Post-Setup Verification
 
