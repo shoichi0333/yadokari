@@ -22,9 +22,17 @@ type AppSupabaseClient = SupabaseClient<Database>;
 
 let browserClient: AppSupabaseClient | null | undefined;
 
+export function cleanEnvValue(value: string | undefined): string {
+  if (!value) return "";
+  return value
+    .replace(/^\uFEFF/, "")
+    .trim()
+    .replace(/^["']|["']$/g, "");
+}
+
 function createSupabaseClient(): AppSupabaseClient | null {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const supabaseUrl = cleanEnvValue(process.env.NEXT_PUBLIC_SUPABASE_URL);
+  const supabaseAnonKey = cleanEnvValue(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
 
   if (!supabaseUrl || !supabaseAnonKey) {
     return null;

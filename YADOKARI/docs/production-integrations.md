@@ -245,6 +245,7 @@ SUPABASE_ACCESS_TOKEN=...
 RESEND_API_KEY=...
 SMTP_ADMIN_EMAIL=noreply@yadokari-minpaku.jp
 SMTP_SENDER_NAME=YADOKARI
+SUPABASE_RATE_LIMIT_EMAIL_SENT=30
 "@ | Set-Content -Encoding utf8 .env.smtp.local
 
 npm run auth:smtp
@@ -252,6 +253,10 @@ Remove-Item .env.smtp.local
 ```
 
 `SUPABASE_ACCESS_TOKEN` is a Supabase dashboard personal access token with permission to update the project auth config. `NEXT_PUBLIC_SUPABASE_URL` is read from `.env.local`, or `SUPABASE_PROJECT_REF` can be set explicitly.
+
+`SUPABASE_RATE_LIMIT_EMAIL_SENT` controls the project-wide hourly limit for Auth endpoints that send email. Supabase's custom SMTP default is low to protect sender reputation, so start at `30` and raise carefully only after deliverability is stable.
+
+After SMTP is already configured, `RESEND_API_KEY` can be omitted to update only `SUPABASE_RATE_LIMIT_EMAIL_SENT`.
 
 ## Post-Setup Verification
 

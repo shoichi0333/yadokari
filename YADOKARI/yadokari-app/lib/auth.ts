@@ -27,42 +27,15 @@ function createAuthUser(user: {
   id: string;
   email?: string;
   created_at?: string;
-  user_metadata?: { name?: string };
+  user_metadata?: { name?: string; display_name?: string };
 }): AuthUser {
   const email = user.email ?? "";
   return {
     id: user.id,
     email,
-    name: user.user_metadata?.name ?? email.split("@")[0],
+    name: user.user_metadata?.name ?? user.user_metadata?.display_name ?? email.split("@")[0],
     createdAt: user.created_at ?? new Date().toISOString(),
   };
-}
-
-function getRegisterErrorMessage(message: string, status?: number, code?: string): string {
-  const normalized = message.toLowerCase();
-
-  if (normalized.includes("already registered") || normalized.includes("already exists")) {
-    return "このメールアドレスはすでに登録されています。ログインしてください。";
-  }
-
-  if (normalized.includes("invalid email")) {
-    return "メールアドレスの形式を確認してください。";
-  }
-
-  if (normalized.includes("password")) {
-    return "パスワードは6文字以上で設定してください。";
-  }
-
-  if (
-    status === 429 ||
-    code === "over_email_send_rate_limit" ||
-    normalized.includes("rate limit") ||
-    normalized.includes("too many")
-  ) {
-    return "確認メールの送信上限に達しました。少し時間をおいてから再度お試しください。";
-  }
-
-  return `認証サービスからエラーが返りました: ${message}`;
 }
 
 export async function login(email: string, password: string): Promise<AuthUser | null> {
@@ -94,29 +67,23 @@ export async function register(
   name: string
 ): Promise<AuthUser | null> {
   if (isSupabaseEnabled()) {
-    const supabase = getSupabaseClient();
-    if (!supabase) return null;
-
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: { name },
-        emailRedirectTo:
-          typeof window !== "undefined"
-            ? `${window.location.origin}/auth/login?registered=1`
-            : undefined,
+    const response = await fetch("/api/auth/register", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
       },
+      body: JSON.stringify({ email, password, name }),
     });
-    if (error) throw new Error(getRegisterErrorMessage(error.message, error.status, error.code));
-    if (!data.user) {
-      throw new Error("登録を完了できませんでした。すでに登録済みの場合はログインしてください。");
-    }
-    if (Array.isArray(data.user.identities) && data.user.identities.length === 0) {
-      throw new Error("このメールアドレスはすでに登録されています。ログインしてください。");
+
+    const data = (await response.json().catch(() => null)) as
+      | { user?: AuthUser; error?: string }
+      | null;
+
+    if (!response.ok || !data?.user) {
+      throw new Error(data?.error ?? "認証サービスとの通信に失敗しました。時間をおいて再度お試しください。");
     }
 
-    return createAuthUser(data.user);
+    return data.user;
   }
 
   if (!email.includes("@") || password.length < 6 || !name.trim()) return null;

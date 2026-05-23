@@ -58,26 +58,35 @@ async function main() {
   }
 
   const accessToken = requireEnv(env, "SUPABASE_ACCESS_TOKEN");
-  const resendApiKey = requireEnv(env, "RESEND_API_KEY");
+  const resendApiKey = env.RESEND_API_KEY;
   const senderEmail = env.SMTP_ADMIN_EMAIL || "noreply@yadokari-minpaku.jp";
   const senderName = env.SMTP_SENDER_NAME || "YADOKARI";
   const smtpPort = env.SMTP_PORT || "465";
 
-  const body = {
-    external_email_enabled: true,
-    mailer_secure_email_change_enabled: true,
-    mailer_autoconfirm: false,
-    smtp_admin_email: senderEmail,
-    smtp_host: env.SMTP_HOST || "smtp.resend.com",
-    smtp_port: smtpPort,
-    smtp_user: env.SMTP_USER || "resend",
-    smtp_pass: resendApiKey,
-    smtp_sender_name: senderName,
+  const body: Record<string, string | number | boolean> = {
+    rate_limit_email_sent: Number(env.SUPABASE_RATE_LIMIT_EMAIL_SENT || "30"),
   };
 
   console.log(`Configuring Supabase Auth SMTP for project ${projectRef}`);
-  console.log(`Sender: ${senderName} <${senderEmail}>`);
-  console.log(`SMTP: ${body.smtp_host}:${body.smtp_port} as ${body.smtp_user}`);
+  console.log(`Auth email rate limit: ${body.rate_limit_email_sent} per hour`);
+
+  if (resendApiKey) {
+    Object.assign(body, {
+      external_email_enabled: true,
+      mailer_secure_email_change_enabled: true,
+      mailer_autoconfirm: false,
+      smtp_admin_email: senderEmail,
+      smtp_host: env.SMTP_HOST || "smtp.resend.com",
+      smtp_port: smtpPort,
+      smtp_user: env.SMTP_USER || "resend",
+      smtp_pass: resendApiKey,
+      smtp_sender_name: senderName,
+    });
+    console.log(`Sender: ${senderName} <${senderEmail}>`);
+    console.log(`SMTP: ${body.smtp_host}:${body.smtp_port} as ${body.smtp_user}`);
+  } else {
+    console.log("RESEND_API_KEY is not set; updating Auth rate limit only.");
+  }
 
   if (env.DRY_RUN === "true") {
     console.log("DRY_RUN=true, not updating Supabase.");
