@@ -56,7 +56,7 @@ export default function RegisterPage() {
 
       router.push("/");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "登録に失敗しました。入力内容を確認してください。");
+      setError(err instanceof Error ? err.message : "認証サービスとの通信に失敗しました。時間をおいて再度お試しください。");
     } finally {
       setLoading(false);
     }

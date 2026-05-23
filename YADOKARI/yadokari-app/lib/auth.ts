@@ -38,7 +38,7 @@ function createAuthUser(user: {
   };
 }
 
-function getRegisterErrorMessage(message: string): string {
+function getRegisterErrorMessage(message: string, status?: number, code?: string): string {
   const normalized = message.toLowerCase();
 
   if (normalized.includes("already registered") || normalized.includes("already exists")) {
@@ -53,11 +53,16 @@ function getRegisterErrorMessage(message: string): string {
     return "パスワードは6文字以上で設定してください。";
   }
 
-  if (normalized.includes("rate limit") || normalized.includes("too many")) {
-    return "短時間に登録を試しすぎています。少し時間をおいてから再度お試しください。";
+  if (
+    status === 429 ||
+    code === "over_email_send_rate_limit" ||
+    normalized.includes("rate limit") ||
+    normalized.includes("too many")
+  ) {
+    return "確認メールの送信上限に達しました。少し時間をおいてから再度お試しください。";
   }
 
-  return "登録に失敗しました。入力内容を確認してください。";
+  return `認証サービスからエラーが返りました: ${message}`;
 }
 
 export async function login(email: string, password: string): Promise<AuthUser | null> {
@@ -103,7 +108,7 @@ export async function register(
             : undefined,
       },
     });
-    if (error) throw new Error(getRegisterErrorMessage(error.message));
+    if (error) throw new Error(getRegisterErrorMessage(error.message, error.status, error.code));
     if (!data.user) {
       throw new Error("登録を完了できませんでした。すでに登録済みの場合はログインしてください。");
     }
