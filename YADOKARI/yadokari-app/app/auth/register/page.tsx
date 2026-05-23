@@ -55,8 +55,8 @@ export default function RegisterPage() {
       }
 
       router.push("/");
-    } catch {
-      setError("登録に失敗しました。入力内容を確認してください。");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "登録に失敗しました。入力内容を確認してください。");
     } finally {
       setLoading(false);
     }

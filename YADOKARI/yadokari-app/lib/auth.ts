@@ -38,6 +38,28 @@ function createAuthUser(user: {
   };
 }
 
+function getRegisterErrorMessage(message: string): string {
+  const normalized = message.toLowerCase();
+
+  if (normalized.includes("already registered") || normalized.includes("already exists")) {
+    return "このメールアドレスはすでに登録されています。ログインしてください。";
+  }
+
+  if (normalized.includes("invalid email")) {
+    return "メールアドレスの形式を確認してください。";
+  }
+
+  if (normalized.includes("password")) {
+    return "パスワードは6文字以上で設定してください。";
+  }
+
+  if (normalized.includes("rate limit") || normalized.includes("too many")) {
+    return "短時間に登録を試しすぎています。少し時間をおいてから再度お試しください。";
+  }
+
+  return "登録に失敗しました。入力内容を確認してください。";
+}
+
 export async function login(email: string, password: string): Promise<AuthUser | null> {
   if (isSupabaseEnabled()) {
     const supabase = getSupabaseClient();
@@ -81,7 +103,11 @@ export async function register(
             : undefined,
       },
     });
-    if (error || !data.user) return null;
+    if (error) throw new Error(getRegisterErrorMessage(error.message));
+    if (!data.user) return null;
+    if (Array.isArray(data.user.identities) && data.user.identities.length === 0) {
+      throw new Error("このメールアドレスはすでに登録されています。ログインしてください。");
+    }
 
     return createAuthUser(data.user);
   }
