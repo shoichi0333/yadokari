@@ -40,7 +40,7 @@ type PageProps = { params: Promise<{ prefecture: string }> };
 const COVERED_PREFECTURES = [...new Set(WARD_ZONING_MAP.map((w) => w.prefecture))].sort();
 
 export function generateStaticParams() {
-  return COVERED_PREFECTURES.map((p) => ({ prefecture: encodeURIComponent(p) }));
+  return COVERED_PREFECTURES.map((p) => ({ prefecture: p }));
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -200,7 +200,7 @@ export default async function PrefectureAreaPage({ params }: PageProps) {
             {wardWithTypes.map((ward) => (
               <Link
                 key={ward.ward}
-                href={`/area/${encodeURIComponent(ward.prefecture)}/${encodeURIComponent(ward.ward)}`}
+                href={`/area/${ward.prefecture}/${ward.ward}`}
                 className="group flex flex-col gap-3 rounded-2xl border border-gray-100 bg-white p-5 shadow-sm transition-all hover:border-teal-200 hover:shadow-md"
               >
                 <div className="flex items-start justify-between gap-2">

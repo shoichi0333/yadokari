@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import Link from "next/link";
+import { getSuumoRentSearchUrl } from "@/lib/propertyPortalLinks";
 
 export type CompetitionListing = {
   id: string;
@@ -22,11 +23,6 @@ export type AreaStats = {
 type Props = {
   listings: CompetitionListing[];
   areaStats: AreaStats[];
-};
-
-const SUUMO_LINKS: Record<string, string> = {
-  港区: "https://suumo.jp/chintai/tokyo/sc_minato/",
-  中野区: "https://suumo.jp/chintai/tokyo/sc_nakano/",
 };
 
 function escapeHtml(value: string) {
@@ -132,7 +128,7 @@ export default function CompetitionMap({ listings, areaStats }: Props) {
 
           <div className="space-y-4">
             {areaStats.map((area) => {
-              const link = SUUMO_LINKS[area.name];
+              const link = getSuumoRentSearchUrl(area.name);
               return (
                 <div key={area.sourceId} className="space-y-2">
                   <div className="flex items-center justify-between gap-3">

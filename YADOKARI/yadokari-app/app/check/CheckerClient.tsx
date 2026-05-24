@@ -23,6 +23,7 @@ import {
 import MinpakuBadge from "@/components/MinpakuBadge";
 import { saveCheckHistory, syncCheckHistory } from "@/lib/checkHistory";
 import { useAuth } from "@/lib/AuthContext";
+import { getSuumoRentSearchUrl } from "@/lib/propertyPortalLinks";
 
 const CheckerMap = dynamic(() => import("./CheckerMap"), { ssr: false });
 
@@ -386,7 +387,7 @@ function ResultCard({ result, mode }: { result: CheckResult; mode: "address" | "
 
       <div className="mt-6 grid gap-3 sm:grid-cols-2">
         <a
-          href={result.suumoUrl ?? `https://suumo.jp/jj/chintai/ichiran/FR301FC001/?ar=030&bs=040&fw=${encodeURIComponent(result.ward ?? result.address)}`}
+          href={result.suumoUrl ?? getSuumoRentSearchUrl(result.prefecture ?? result.address, result.ward ?? undefined)}
           target="_blank"
           rel="noreferrer"
           className="flex items-center justify-center gap-2 rounded-xl bg-teal-600 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-teal-700"
@@ -410,7 +411,7 @@ function ResultCard({ result, mode }: { result: CheckResult; mode: "address" | "
         </Link>
         {result.prefecture && result.ward && (
           <Link
-            href={`/area/${encodeURIComponent(result.prefecture)}/${encodeURIComponent(result.ward)}`}
+            href={`/area/${result.prefecture}/${result.ward}`}
             className="flex items-center justify-center gap-2 rounded-xl border border-gray-200 px-4 py-3 text-sm font-semibold text-gray-700 transition-colors hover:border-teal-200 hover:bg-teal-50 hover:text-teal-700"
           >
             <MapPin size={16} />

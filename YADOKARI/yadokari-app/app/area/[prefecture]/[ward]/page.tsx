@@ -6,6 +6,7 @@ import MinpakuBadge from "@/components/MinpakuBadge";
 import { WARD_ZONING_MAP } from "@/lib/data/wardZoning";
 import { getMinpakuInfo, getMinpakuBadgeType } from "@/lib/minpaku";
 import { getSiteUrl } from "@/lib/config";
+import { getSuumoRentSearchUrl } from "@/lib/propertyPortalLinks";
 
 const siteUrl = getSiteUrl();
 
@@ -36,8 +37,8 @@ type PageProps = { params: Promise<{ prefecture: string; ward: string }> };
 
 export function generateStaticParams() {
   return WARD_ZONING_MAP.map((w) => ({
-    prefecture: encodeURIComponent(w.prefecture),
-    ward: encodeURIComponent(w.ward),
+    prefecture: w.prefecture,
+    ward: w.ward,
   }));
 }
 
@@ -117,6 +118,7 @@ export default async function WardPage({ params }: PageProps) {
   ] as const;
 
   const relatedBlog = PREFECTURE_BLOG_MAP[prefecture];
+  const suumoUrl = getSuumoRentSearchUrl(prefecture, ward);
 
   return (
     <main className="bg-gray-50">
@@ -132,7 +134,7 @@ export default async function WardPage({ params }: PageProps) {
             <span>/</span>
             <Link href="/area" className="hover:text-teal-600">エリア</Link>
             <span>/</span>
-            <Link href={`/area/${encodeURIComponent(prefecture)}`} className="hover:text-teal-600">{prefecture}</Link>
+            <Link href={`/area/${prefecture}`} className="hover:text-teal-600">{prefecture}</Link>
             <span>/</span>
             <span className="text-gray-700">{ward}</span>
           </div>
@@ -162,7 +164,7 @@ export default async function WardPage({ params }: PageProps) {
               住所を指定して詳しく調べる
             </Link>
             <a
-              href={wardData.suumoUrl}
+              href={suumoUrl}
               target="_blank"
               rel="noreferrer"
               className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-5 py-3 text-sm font-semibold text-gray-700 hover:border-teal-200 hover:bg-teal-50 hover:text-teal-700 transition-colors"
@@ -211,7 +213,7 @@ export default async function WardPage({ params }: PageProps) {
           <h2 className="text-xl font-bold text-gray-900 mb-4">{prefecture}の他のエリア</h2>
           <div className="flex flex-wrap gap-3">
             <Link
-              href={`/area/${encodeURIComponent(prefecture)}`}
+              href={`/area/${prefecture}`}
               className="inline-flex items-center gap-2 rounded-xl border border-gray-100 bg-white px-5 py-3 text-sm font-semibold text-teal-700 shadow-sm hover:border-teal-200 hover:shadow-md transition-all"
             >
               <MapPin size={16} />

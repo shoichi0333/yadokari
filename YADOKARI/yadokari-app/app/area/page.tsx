@@ -70,7 +70,7 @@ export default function AreaIndexPage() {
           {prefectureAreas.map(({ prefecture, wardCount }) => (
             <Link
               key={prefecture}
-              href={`/area/${encodeURIComponent(prefecture)}`}
+              href={`/area/${prefecture}`}
               className="group rounded-2xl border border-gray-100 bg-white p-5 shadow-sm transition-all hover:border-teal-200 hover:shadow-md"
             >
               <div className="flex items-start justify-between gap-4">

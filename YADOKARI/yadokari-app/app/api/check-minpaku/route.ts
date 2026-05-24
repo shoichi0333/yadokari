@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { findWardZoning, getEligibilityFromWard } from "@/lib/data/wardZoning";
 import { getMinpakuBadgeType } from "@/lib/minpaku";
+import { getSuumoRentSearchUrl } from "@/lib/propertyPortalLinks";
 import fs from "fs";
 import path from "path";
 
@@ -89,7 +90,7 @@ export async function GET(request: NextRequest) {
     typicalZoning: wardData.typicalZoning,
     tokkuArea: wardData.tokkuArea,
     notes: wardData.notes,
-    suumoUrl: wardData.suumoUrl,
+    suumoUrl: getSuumoRentSearchUrl(wardData.prefecture, wardData.ward),
     minpakuInfo: correctedInfo,
     badgeType,
     competitionCount,

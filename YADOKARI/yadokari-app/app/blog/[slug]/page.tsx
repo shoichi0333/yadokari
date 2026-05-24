@@ -257,7 +257,7 @@ export default async function BlogPostPage({ params }: PageProps) {
               {post.prefecture}のエリア別民泊可否ガイド
             </p>
             <Link
-              href={`/area/${encodeURIComponent(post.prefecture)}`}
+              href={`/area/${post.prefecture}`}
               className="inline-flex flex-shrink-0 items-center gap-1.5 rounded-lg bg-teal-50 px-4 py-2 text-sm font-semibold text-teal-700 transition-colors hover:bg-teal-100"
             >
               エリアガイドを見る

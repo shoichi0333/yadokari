@@ -1,3 +1,5 @@
+import { getAthomeRentSearchUrl, getSuumoRentSearchUrl } from "@/lib/propertyPortalLinks";
+
 export type MinpakuType = "JUUTAKU" | "TOKKU" | "RYOKAN";
 
 export interface Area {
@@ -13,7 +15,9 @@ export interface Area {
   athomeUrl: string;
 }
 
-export const AREAS: Area[] = [
+type AreaSeed = Omit<Area, "suumoRentUrl" | "athomeUrl">;
+
+const RAW_AREAS: AreaSeed[] = [
   {
     id: "hokkaido-sapporo-chuo",
     name: "札幌市中央区",
@@ -23,8 +27,6 @@ export const AREAS: Area[] = [
     minpakuTypes: ["JUUTAKU", "RYOKAN"],
     tokkuArea: false,
     competitionCount: 0,
-    suumoRentUrl: "https://suumo.jp/chintai/hokkaido/sc_sapporo_chuo/",
-    athomeUrl: "https://www.athome.co.jp/chintai/hokkaido/sapporo-chuo-city/",
   },
   {
     id: "hokkaido-hakodate",
@@ -35,8 +37,6 @@ export const AREAS: Area[] = [
     minpakuTypes: ["JUUTAKU", "RYOKAN"],
     tokkuArea: false,
     competitionCount: 0,
-    suumoRentUrl: "https://suumo.jp/chintai/hokkaido/sc_hakodate/",
-    athomeUrl: "https://www.athome.co.jp/chintai/hokkaido/hakodate-city/",
   },
   {
     id: "hokkaido-otaru",
@@ -47,8 +47,6 @@ export const AREAS: Area[] = [
     minpakuTypes: ["JUUTAKU", "RYOKAN"],
     tokkuArea: false,
     competitionCount: 0,
-    suumoRentUrl: "https://suumo.jp/chintai/hokkaido/sc_otaru/",
-    athomeUrl: "https://www.athome.co.jp/chintai/hokkaido/otaru-city/",
   },
   {
     id: "hokkaido-niseko",
@@ -59,8 +57,6 @@ export const AREAS: Area[] = [
     minpakuTypes: ["JUUTAKU", "RYOKAN"],
     tokkuArea: false,
     competitionCount: 0,
-    suumoRentUrl: "https://suumo.jp/chintai/hokkaido/",
-    athomeUrl: "https://www.athome.co.jp/chintai/hokkaido/niseko-town/",
   },
   {
     id: "hokkaido-furano-biei",
@@ -71,8 +67,6 @@ export const AREAS: Area[] = [
     minpakuTypes: ["JUUTAKU"],
     tokkuArea: false,
     competitionCount: 0,
-    suumoRentUrl: "https://suumo.jp/chintai/hokkaido/",
-    athomeUrl: "https://www.athome.co.jp/chintai/hokkaido/furano-city/",
   },
   {
     id: "hokkaido-asahikawa",
@@ -83,8 +77,6 @@ export const AREAS: Area[] = [
     minpakuTypes: ["JUUTAKU"],
     tokkuArea: false,
     competitionCount: 0,
-    suumoRentUrl: "https://suumo.jp/chintai/hokkaido/sc_asahikawa/",
-    athomeUrl: "https://www.athome.co.jp/chintai/hokkaido/asahikawa-city/",
   },
   {
     id: "tohoku-sendai",
@@ -95,8 +87,6 @@ export const AREAS: Area[] = [
     minpakuTypes: ["JUUTAKU", "RYOKAN"],
     tokkuArea: false,
     competitionCount: 0,
-    suumoRentUrl: "https://suumo.jp/chintai/miyagi/sc_sendai/",
-    athomeUrl: "https://www.athome.co.jp/chintai/miyagi/sendai-city/",
   },
   {
     id: "tohoku-aizuwakamatsu",
@@ -107,8 +97,6 @@ export const AREAS: Area[] = [
     minpakuTypes: ["JUUTAKU"],
     tokkuArea: false,
     competitionCount: 0,
-    suumoRentUrl: "https://suumo.jp/chintai/fukushima/sc_aizuwakamatsu/",
-    athomeUrl: "https://www.athome.co.jp/chintai/fukushima/aizuwakamatsu-city/",
   },
   {
     id: "tohoku-morioka",
@@ -119,8 +107,6 @@ export const AREAS: Area[] = [
     minpakuTypes: ["JUUTAKU"],
     tokkuArea: false,
     competitionCount: 0,
-    suumoRentUrl: "https://suumo.jp/chintai/iwate/sc_morioka/",
-    athomeUrl: "https://www.athome.co.jp/chintai/iwate/morioka-city/",
   },
   {
     id: "tohoku-kakunodate",
@@ -131,8 +117,6 @@ export const AREAS: Area[] = [
     minpakuTypes: ["JUUTAKU"],
     tokkuArea: false,
     competitionCount: 0,
-    suumoRentUrl: "https://suumo.jp/chintai/akita/",
-    athomeUrl: "https://www.athome.co.jp/chintai/akita/semboku-city/",
   },
   {
     id: "tokyo-minato",
@@ -143,8 +127,6 @@ export const AREAS: Area[] = [
     minpakuTypes: ["JUUTAKU", "RYOKAN"],
     tokkuArea: false,
     competitionCount: 843,
-    suumoRentUrl: "https://suumo.jp/chintai/tokyo/sc_minato/",
-    athomeUrl: "https://www.athome.co.jp/chintai/tokyo/minato-city/",
   },
   {
     id: "tokyo-nakano",
@@ -155,8 +137,6 @@ export const AREAS: Area[] = [
     minpakuTypes: ["JUUTAKU"],
     tokkuArea: false,
     competitionCount: 397,
-    suumoRentUrl: "https://suumo.jp/chintai/tokyo/sc_nakano/",
-    athomeUrl: "https://www.athome.co.jp/chintai/tokyo/nakano-city/",
   },
   {
     id: "tokyo-shinjuku",
@@ -167,8 +147,6 @@ export const AREAS: Area[] = [
     minpakuTypes: ["JUUTAKU", "RYOKAN"],
     tokkuArea: false,
     competitionCount: 0,
-    suumoRentUrl: "https://suumo.jp/chintai/tokyo/sc_shinjuku/",
-    athomeUrl: "https://www.athome.co.jp/chintai/tokyo/shinjuku-city/",
   },
   {
     id: "tokyo-taito",
@@ -179,8 +157,6 @@ export const AREAS: Area[] = [
     minpakuTypes: ["JUUTAKU", "RYOKAN"],
     tokkuArea: false,
     competitionCount: 0,
-    suumoRentUrl: "https://suumo.jp/chintai/tokyo/sc_taito/",
-    athomeUrl: "https://www.athome.co.jp/chintai/tokyo/taito-city/",
   },
   {
     id: "tokyo-ota",
@@ -191,8 +167,6 @@ export const AREAS: Area[] = [
     minpakuTypes: ["JUUTAKU", "TOKKU", "RYOKAN"],
     tokkuArea: true,
     competitionCount: 0,
-    suumoRentUrl: "https://suumo.jp/chintai/tokyo/sc_ota/",
-    athomeUrl: "https://www.athome.co.jp/chintai/tokyo/ota-city/",
   },
   {
     id: "tokyo-shibuya",
@@ -203,8 +177,6 @@ export const AREAS: Area[] = [
     minpakuTypes: ["JUUTAKU", "RYOKAN"],
     tokkuArea: false,
     competitionCount: 0,
-    suumoRentUrl: "https://suumo.jp/chintai/tokyo/sc_shibuya/",
-    athomeUrl: "https://www.athome.co.jp/chintai/tokyo/shibuya-city/",
   },
   {
     id: "tokyo-sumida",
@@ -215,8 +187,6 @@ export const AREAS: Area[] = [
     minpakuTypes: ["JUUTAKU"],
     tokkuArea: false,
     competitionCount: 0,
-    suumoRentUrl: "https://suumo.jp/chintai/tokyo/sc_sumida/",
-    athomeUrl: "https://www.athome.co.jp/chintai/tokyo/sumida-city/",
   },
   {
     id: "tokyo-bunkyo",
@@ -227,8 +197,6 @@ export const AREAS: Area[] = [
     minpakuTypes: ["JUUTAKU"],
     tokkuArea: false,
     competitionCount: 0,
-    suumoRentUrl: "https://suumo.jp/chintai/tokyo/sc_bunkyo/",
-    athomeUrl: "https://www.athome.co.jp/chintai/tokyo/bunkyo-city/",
   },
   {
     id: "tokyo-toshima",
@@ -239,8 +207,6 @@ export const AREAS: Area[] = [
     minpakuTypes: ["JUUTAKU"],
     tokkuArea: false,
     competitionCount: 0,
-    suumoRentUrl: "https://suumo.jp/chintai/tokyo/sc_toshima/",
-    athomeUrl: "https://www.athome.co.jp/chintai/tokyo/toshima-city/",
   },
   {
     id: "kanto-yokohama",
@@ -251,8 +217,6 @@ export const AREAS: Area[] = [
     minpakuTypes: ["JUUTAKU", "RYOKAN"],
     tokkuArea: false,
     competitionCount: 494,
-    suumoRentUrl: "https://suumo.jp/chintai/kanagawa/sc_yokohama/",
-    athomeUrl: "https://www.athome.co.jp/chintai/kanagawa/yokohama-city/",
   },
   {
     id: "kanto-kamakura",
@@ -263,8 +227,6 @@ export const AREAS: Area[] = [
     minpakuTypes: ["JUUTAKU", "RYOKAN"],
     tokkuArea: false,
     competitionCount: 0,
-    suumoRentUrl: "https://suumo.jp/chintai/kanagawa/sc_kamakura/",
-    athomeUrl: "https://www.athome.co.jp/chintai/kanagawa/kamakura-city/",
   },
   {
     id: "kanto-hakone",
@@ -275,8 +237,6 @@ export const AREAS: Area[] = [
     minpakuTypes: ["JUUTAKU", "RYOKAN"],
     tokkuArea: false,
     competitionCount: 0,
-    suumoRentUrl: "https://suumo.jp/chintai/kanagawa/",
-    athomeUrl: "https://www.athome.co.jp/chintai/kanagawa/hakone-town/",
   },
   {
     id: "kanto-chiba",
@@ -287,8 +247,6 @@ export const AREAS: Area[] = [
     minpakuTypes: ["JUUTAKU", "RYOKAN"],
     tokkuArea: false,
     competitionCount: 0,
-    suumoRentUrl: "https://suumo.jp/chintai/chiba/sc_chiba/",
-    athomeUrl: "https://www.athome.co.jp/chintai/chiba/chiba-city/",
   },
   {
     id: "kanto-urayasu",
@@ -299,8 +257,6 @@ export const AREAS: Area[] = [
     minpakuTypes: ["JUUTAKU", "RYOKAN"],
     tokkuArea: false,
     competitionCount: 0,
-    suumoRentUrl: "https://suumo.jp/chintai/chiba/sc_urayasu/",
-    athomeUrl: "https://www.athome.co.jp/chintai/chiba/urayasu-city/",
   },
   {
     id: "kanto-saitama",
@@ -311,8 +267,6 @@ export const AREAS: Area[] = [
     minpakuTypes: ["JUUTAKU"],
     tokkuArea: false,
     competitionCount: 0,
-    suumoRentUrl: "https://suumo.jp/chintai/saitama/sc_saitama/",
-    athomeUrl: "https://www.athome.co.jp/chintai/saitama/saitama-city/",
   },
   {
     id: "kanto-nikko",
@@ -323,8 +277,6 @@ export const AREAS: Area[] = [
     minpakuTypes: ["JUUTAKU", "RYOKAN"],
     tokkuArea: false,
     competitionCount: 0,
-    suumoRentUrl: "https://suumo.jp/chintai/tochigi/sc_nikko/",
-    athomeUrl: "https://www.athome.co.jp/chintai/tochigi/nikko-city/",
   },
   {
     id: "chubu-nagoya",
@@ -335,8 +287,6 @@ export const AREAS: Area[] = [
     minpakuTypes: ["JUUTAKU", "RYOKAN"],
     tokkuArea: false,
     competitionCount: 195,
-    suumoRentUrl: "https://suumo.jp/chintai/aichi/sc_nagoya/",
-    athomeUrl: "https://www.athome.co.jp/chintai/aichi/nagoya-city/",
   },
   {
     id: "chubu-shizuoka-hamamatsu",
@@ -347,8 +297,6 @@ export const AREAS: Area[] = [
     minpakuTypes: ["JUUTAKU", "RYOKAN"],
     tokkuArea: false,
     competitionCount: 498,
-    suumoRentUrl: "https://suumo.jp/chintai/shizuoka/",
-    athomeUrl: "https://www.athome.co.jp/chintai/shizuoka/shizuoka-city/",
   },
   {
     id: "chubu-fujiyoshida",
@@ -359,8 +307,6 @@ export const AREAS: Area[] = [
     minpakuTypes: ["JUUTAKU", "RYOKAN"],
     tokkuArea: false,
     competitionCount: 0,
-    suumoRentUrl: "https://suumo.jp/chintai/yamanashi/sc_fujiyoshida/",
-    athomeUrl: "https://www.athome.co.jp/chintai/yamanashi/fujiyoshida-city/",
   },
   {
     id: "chubu-matsumoto",
@@ -371,8 +317,6 @@ export const AREAS: Area[] = [
     minpakuTypes: ["JUUTAKU", "RYOKAN"],
     tokkuArea: false,
     competitionCount: 192,
-    suumoRentUrl: "https://suumo.jp/chintai/nagano/sc_matsumoto/",
-    athomeUrl: "https://www.athome.co.jp/chintai/nagano/matsumoto-city/",
   },
   {
     id: "chubu-hakuba",
@@ -383,8 +327,6 @@ export const AREAS: Area[] = [
     minpakuTypes: ["JUUTAKU", "RYOKAN"],
     tokkuArea: false,
     competitionCount: 0,
-    suumoRentUrl: "https://suumo.jp/chintai/nagano/",
-    athomeUrl: "https://www.athome.co.jp/chintai/nagano/hakuba-village/",
   },
   {
     id: "chubu-karuizawa",
@@ -395,8 +337,6 @@ export const AREAS: Area[] = [
     minpakuTypes: ["JUUTAKU", "RYOKAN"],
     tokkuArea: false,
     competitionCount: 0,
-    suumoRentUrl: "https://suumo.jp/chintai/nagano/",
-    athomeUrl: "https://www.athome.co.jp/chintai/nagano/karuizawa-town/",
   },
   {
     id: "chubu-kanazawa",
@@ -407,8 +347,6 @@ export const AREAS: Area[] = [
     minpakuTypes: ["JUUTAKU", "RYOKAN"],
     tokkuArea: false,
     competitionCount: 0,
-    suumoRentUrl: "https://suumo.jp/chintai/ishikawa/sc_kanazawa/",
-    athomeUrl: "https://www.athome.co.jp/chintai/ishikawa/kanazawa-city/",
   },
   {
     id: "chubu-takayama",
@@ -419,8 +357,6 @@ export const AREAS: Area[] = [
     minpakuTypes: ["JUUTAKU", "RYOKAN"],
     tokkuArea: false,
     competitionCount: 0,
-    suumoRentUrl: "https://suumo.jp/chintai/gifu/sc_takayama/",
-    athomeUrl: "https://www.athome.co.jp/chintai/gifu/takayama-city/",
   },
   {
     id: "kinki-osaka-namba",
@@ -431,8 +367,6 @@ export const AREAS: Area[] = [
     minpakuTypes: ["JUUTAKU", "TOKKU", "RYOKAN"],
     tokkuArea: true,
     competitionCount: 0,
-    suumoRentUrl: "https://suumo.jp/chintai/osaka/sc_osaka_naniwa/",
-    athomeUrl: "https://www.athome.co.jp/chintai/osaka/naniwa-city/",
   },
   {
     id: "kinki-osaka-shinsaibashi",
@@ -443,8 +377,6 @@ export const AREAS: Area[] = [
     minpakuTypes: ["JUUTAKU", "TOKKU", "RYOKAN"],
     tokkuArea: true,
     competitionCount: 0,
-    suumoRentUrl: "https://suumo.jp/chintai/osaka/sc_osaka_kita/",
-    athomeUrl: "https://www.athome.co.jp/chintai/osaka/kita-city/",
   },
   {
     id: "kinki-kyoto-higashiyama",
@@ -455,8 +387,6 @@ export const AREAS: Area[] = [
     minpakuTypes: ["JUUTAKU", "RYOKAN"],
     tokkuArea: false,
     competitionCount: 0,
-    suumoRentUrl: "https://suumo.jp/chintai/kyoto/sc_kyoto_higashiyama/",
-    athomeUrl: "https://www.athome.co.jp/chintai/kyoto/higashiyama-city/",
   },
   {
     id: "kinki-nara",
@@ -467,8 +397,6 @@ export const AREAS: Area[] = [
     minpakuTypes: ["JUUTAKU", "RYOKAN"],
     tokkuArea: false,
     competitionCount: 0,
-    suumoRentUrl: "https://suumo.jp/chintai/nara/sc_nara/",
-    athomeUrl: "https://www.athome.co.jp/chintai/nara/nara-city/",
   },
   {
     id: "kinki-kobe",
@@ -479,8 +407,6 @@ export const AREAS: Area[] = [
     minpakuTypes: ["JUUTAKU", "RYOKAN"],
     tokkuArea: false,
     competitionCount: 0,
-    suumoRentUrl: "https://suumo.jp/chintai/hyogo/sc_kobe/",
-    athomeUrl: "https://www.athome.co.jp/chintai/hyogo/kobe-city/",
   },
   {
     id: "kinki-arima-onsen",
@@ -491,8 +417,6 @@ export const AREAS: Area[] = [
     minpakuTypes: ["RYOKAN"],
     tokkuArea: false,
     competitionCount: 0,
-    suumoRentUrl: "https://suumo.jp/chintai/hyogo/sc_kobe_kita/",
-    athomeUrl: "https://www.athome.co.jp/chintai/hyogo/kobe-kita-city/",
   },
   {
     id: "kinki-wakayama",
@@ -503,8 +427,6 @@ export const AREAS: Area[] = [
     minpakuTypes: ["JUUTAKU", "RYOKAN"],
     tokkuArea: false,
     competitionCount: 0,
-    suumoRentUrl: "https://suumo.jp/chintai/wakayama/sc_wakayama/",
-    athomeUrl: "https://www.athome.co.jp/chintai/wakayama/wakayama-city/",
   },
   {
     id: "kinki-otsu",
@@ -515,8 +437,6 @@ export const AREAS: Area[] = [
     minpakuTypes: ["JUUTAKU"],
     tokkuArea: false,
     competitionCount: 0,
-    suumoRentUrl: "https://suumo.jp/chintai/shiga/sc_otsu/",
-    athomeUrl: "https://www.athome.co.jp/chintai/shiga/otsu-city/",
   },
   {
     id: "chugoku-shikoku-hiroshima",
@@ -527,8 +447,6 @@ export const AREAS: Area[] = [
     minpakuTypes: ["JUUTAKU", "RYOKAN"],
     tokkuArea: false,
     competitionCount: 0,
-    suumoRentUrl: "https://suumo.jp/chintai/hiroshima/sc_hiroshima/",
-    athomeUrl: "https://www.athome.co.jp/chintai/hiroshima/hiroshima-city/",
   },
   {
     id: "chugoku-shikoku-hatsukaichi-miyajima",
@@ -539,8 +457,6 @@ export const AREAS: Area[] = [
     minpakuTypes: ["JUUTAKU", "RYOKAN"],
     tokkuArea: false,
     competitionCount: 0,
-    suumoRentUrl: "https://suumo.jp/chintai/hiroshima/sc_hatsukaichi/",
-    athomeUrl: "https://www.athome.co.jp/chintai/hiroshima/hatsukaichi-city/",
   },
   {
     id: "chugoku-shikoku-okayama",
@@ -551,8 +467,6 @@ export const AREAS: Area[] = [
     minpakuTypes: ["JUUTAKU", "RYOKAN"],
     tokkuArea: false,
     competitionCount: 0,
-    suumoRentUrl: "https://suumo.jp/chintai/okayama/sc_okayama/",
-    athomeUrl: "https://www.athome.co.jp/chintai/okayama/okayama-city/",
   },
   {
     id: "chugoku-shikoku-matsuyama",
@@ -563,8 +477,6 @@ export const AREAS: Area[] = [
     minpakuTypes: ["JUUTAKU", "RYOKAN"],
     tokkuArea: false,
     competitionCount: 0,
-    suumoRentUrl: "https://suumo.jp/chintai/ehime/sc_matsuyama/",
-    athomeUrl: "https://www.athome.co.jp/chintai/ehime/matsuyama-city/",
   },
   {
     id: "chugoku-shikoku-takamatsu",
@@ -575,8 +487,6 @@ export const AREAS: Area[] = [
     minpakuTypes: ["JUUTAKU", "RYOKAN"],
     tokkuArea: false,
     competitionCount: 0,
-    suumoRentUrl: "https://suumo.jp/chintai/kagawa/sc_takamatsu/",
-    athomeUrl: "https://www.athome.co.jp/chintai/kagawa/takamatsu-city/",
   },
   {
     id: "kyushu-fukuoka-hakata",
@@ -587,8 +497,6 @@ export const AREAS: Area[] = [
     minpakuTypes: ["JUUTAKU", "RYOKAN"],
     tokkuArea: false,
     competitionCount: 0,
-    suumoRentUrl: "https://suumo.jp/chintai/fukuoka/sc_fukuoka_hakata/",
-    athomeUrl: "https://www.athome.co.jp/chintai/fukuoka/fukuoka-hakata-city/",
   },
   {
     id: "kyushu-fukuoka-tenjin",
@@ -599,8 +507,6 @@ export const AREAS: Area[] = [
     minpakuTypes: ["JUUTAKU", "RYOKAN"],
     tokkuArea: false,
     competitionCount: 0,
-    suumoRentUrl: "https://suumo.jp/chintai/fukuoka/sc_fukuoka_chuo/",
-    athomeUrl: "https://www.athome.co.jp/chintai/fukuoka/fukuoka-chuo-city/",
   },
   {
     id: "kyushu-nagasaki",
@@ -611,8 +517,6 @@ export const AREAS: Area[] = [
     minpakuTypes: ["JUUTAKU", "RYOKAN"],
     tokkuArea: false,
     competitionCount: 0,
-    suumoRentUrl: "https://suumo.jp/chintai/nagasaki/sc_nagasaki/",
-    athomeUrl: "https://www.athome.co.jp/chintai/nagasaki/nagasaki-city/",
   },
   {
     id: "kyushu-kumamoto",
@@ -623,8 +527,6 @@ export const AREAS: Area[] = [
     minpakuTypes: ["JUUTAKU", "RYOKAN"],
     tokkuArea: false,
     competitionCount: 0,
-    suumoRentUrl: "https://suumo.jp/chintai/kumamoto/sc_kumamoto/",
-    athomeUrl: "https://www.athome.co.jp/chintai/kumamoto/kumamoto-city/",
   },
   {
     id: "kyushu-beppu",
@@ -635,8 +537,6 @@ export const AREAS: Area[] = [
     minpakuTypes: ["JUUTAKU", "RYOKAN"],
     tokkuArea: false,
     competitionCount: 0,
-    suumoRentUrl: "https://suumo.jp/chintai/oita/sc_beppu/",
-    athomeUrl: "https://www.athome.co.jp/chintai/oita/beppu-city/",
   },
   {
     id: "kyushu-yufuin",
@@ -647,8 +547,6 @@ export const AREAS: Area[] = [
     minpakuTypes: ["RYOKAN"],
     tokkuArea: false,
     competitionCount: 0,
-    suumoRentUrl: "https://suumo.jp/chintai/oita/sc_yufu/",
-    athomeUrl: "https://www.athome.co.jp/chintai/oita/yufu-city/",
   },
   {
     id: "kyushu-kagoshima",
@@ -659,8 +557,6 @@ export const AREAS: Area[] = [
     minpakuTypes: ["JUUTAKU", "RYOKAN"],
     tokkuArea: false,
     competitionCount: 0,
-    suumoRentUrl: "https://suumo.jp/chintai/kagoshima/sc_kagoshima/",
-    athomeUrl: "https://www.athome.co.jp/chintai/kagoshima/kagoshima-city/",
   },
   {
     id: "okinawa-naha",
@@ -671,8 +567,6 @@ export const AREAS: Area[] = [
     minpakuTypes: ["JUUTAKU", "RYOKAN"],
     tokkuArea: false,
     competitionCount: 0,
-    suumoRentUrl: "https://suumo.jp/chintai/okinawa/sc_naha/",
-    athomeUrl: "https://www.athome.co.jp/chintai/okinawa/naha-city/",
   },
   {
     id: "okinawa-ishigaki",
@@ -683,8 +577,6 @@ export const AREAS: Area[] = [
     minpakuTypes: ["JUUTAKU", "RYOKAN"],
     tokkuArea: false,
     competitionCount: 0,
-    suumoRentUrl: "https://suumo.jp/chintai/okinawa/sc_ishigaki/",
-    athomeUrl: "https://www.athome.co.jp/chintai/okinawa/ishigaki-city/",
   },
   {
     id: "okinawa-miyakojima",
@@ -695,8 +587,6 @@ export const AREAS: Area[] = [
     minpakuTypes: ["JUUTAKU", "RYOKAN"],
     tokkuArea: false,
     competitionCount: 0,
-    suumoRentUrl: "https://suumo.jp/chintai/okinawa/sc_miyakojima/",
-    athomeUrl: "https://www.athome.co.jp/chintai/okinawa/miyakojima-city/",
   },
   {
     id: "okinawa-onna",
@@ -707,8 +597,6 @@ export const AREAS: Area[] = [
     minpakuTypes: ["JUUTAKU", "RYOKAN"],
     tokkuArea: false,
     competitionCount: 0,
-    suumoRentUrl: "https://suumo.jp/chintai/okinawa/",
-    athomeUrl: "https://www.athome.co.jp/chintai/okinawa/onna-village/",
   },
   {
     id: "tohoku-sendai-aoba",
@@ -719,8 +607,6 @@ export const AREAS: Area[] = [
     minpakuTypes: ["JUUTAKU", "RYOKAN"],
     tokkuArea: false,
     competitionCount: 0,
-    suumoRentUrl: "https://suumo.jp/chintai/miyagi/sc_sendai_aoba/",
-    athomeUrl: "https://www.athome.co.jp/chintai/miyagi/sendai-aoba-city/",
   },
   {
     id: "chugoku-hiroshima-naka",
@@ -731,8 +617,6 @@ export const AREAS: Area[] = [
     minpakuTypes: ["JUUTAKU", "RYOKAN"],
     tokkuArea: false,
     competitionCount: 0,
-    suumoRentUrl: "https://suumo.jp/chintai/hiroshima/sc_hiroshima_naka/",
-    athomeUrl: "https://www.athome.co.jp/chintai/hiroshima/hiroshima-naka-city/",
   },
   {
     id: "chubu-kanazawa-city",
@@ -743,8 +627,6 @@ export const AREAS: Area[] = [
     minpakuTypes: ["JUUTAKU", "RYOKAN"],
     tokkuArea: false,
     competitionCount: 0,
-    suumoRentUrl: "https://suumo.jp/chintai/ishikawa/sc_kanazawa/",
-    athomeUrl: "https://www.athome.co.jp/chintai/ishikawa/kanazawa-city/",
   },
   {
     id: "kyushu-kumamoto-chuo",
@@ -755,8 +637,6 @@ export const AREAS: Area[] = [
     minpakuTypes: ["JUUTAKU", "RYOKAN"],
     tokkuArea: false,
     competitionCount: 0,
-    suumoRentUrl: "https://suumo.jp/chintai/kumamoto/sc_kumamoto_chuo/",
-    athomeUrl: "https://www.athome.co.jp/chintai/kumamoto/kumamoto-chuo-city/",
   },
   {
     id: "kanto-saitama-omiya",
@@ -767,8 +647,6 @@ export const AREAS: Area[] = [
     minpakuTypes: ["JUUTAKU", "RYOKAN"],
     tokkuArea: false,
     competitionCount: 0,
-    suumoRentUrl: "https://suumo.jp/chintai/saitama/sc_saitama_omiya/",
-    athomeUrl: "https://www.athome.co.jp/chintai/saitama/saitama-omiya-city/",
   },
   {
     id: "kanto-chiba-chuo",
@@ -779,8 +657,6 @@ export const AREAS: Area[] = [
     minpakuTypes: ["JUUTAKU", "RYOKAN"],
     tokkuArea: false,
     competitionCount: 0,
-    suumoRentUrl: "https://suumo.jp/chintai/chiba/sc_chiba_chuo/",
-    athomeUrl: "https://www.athome.co.jp/chintai/chiba/chiba-chuo-city/",
   },
   {
     id: "chubu-shizuoka-aoi",
@@ -791,8 +667,6 @@ export const AREAS: Area[] = [
     minpakuTypes: ["JUUTAKU", "RYOKAN"],
     tokkuArea: false,
     competitionCount: 0,
-    suumoRentUrl: "https://suumo.jp/chintai/shizuoka/sc_shizuoka_aoi/",
-    athomeUrl: "https://www.athome.co.jp/chintai/shizuoka/shizuoka-aoi-city/",
   },
   {
     id: "chubu-atami",
@@ -803,10 +677,14 @@ export const AREAS: Area[] = [
     minpakuTypes: ["JUUTAKU", "RYOKAN"],
     tokkuArea: false,
     competitionCount: 0,
-    suumoRentUrl: "https://suumo.jp/chintai/shizuoka/sc_atami/",
-    athomeUrl: "https://www.athome.co.jp/chintai/shizuoka/atami-city/",
   },
 ];
+
+export const AREAS: Area[] = RAW_AREAS.map((area) => ({
+  ...area,
+  suumoRentUrl: getSuumoRentSearchUrl(area.prefecture, area.name),
+  athomeUrl: getAthomeRentSearchUrl(area.prefecture, area.name),
+}));
 
 export const REGIONS = [...new Set(AREAS.map((a) => a.region))];
 
