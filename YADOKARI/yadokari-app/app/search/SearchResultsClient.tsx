@@ -13,6 +13,7 @@ import {
   getCompetitionDensity,
   MinpakuType,
 } from "@/lib/data/areas";
+import { getAthomeRentSearchUrl, getSuumoRentSearchUrl } from "@/lib/propertyPortalLinks";
 
 type RegionFilter = "すべて" | (typeof REGIONS)[number];
 type TypeFilter = "ALL" | MinpakuType;
@@ -90,6 +91,8 @@ function AreaCard({
 }) {
   const density = getCompetitionDensity(area.competitionCount);
   const investmentIndicator = INVESTMENT_INDICATORS[density];
+  const suumoUrl = getSuumoRentSearchUrl(area.prefecture, area.name);
+  const athomeUrl = getAthomeRentSearchUrl(area.prefecture, area.name);
 
   return (
     <article className="flex h-full flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition-all hover:border-teal-300 hover:shadow-md">
@@ -157,7 +160,7 @@ function AreaCard({
             YADOKARIで物件を探す
           </Link>
           <a
-            href={area.suumoRentUrl}
+            href={suumoUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-gray-200 px-3 py-2.5 text-sm font-semibold text-gray-700 transition-colors hover:border-teal-300 hover:bg-teal-50 hover:text-teal-700"
@@ -166,7 +169,7 @@ function AreaCard({
             <ExternalLink size={14} />
           </a>
           <a
-            href={area.athomeUrl}
+            href={athomeUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-gray-200 px-3 py-2.5 text-sm font-semibold text-gray-700 transition-colors hover:border-teal-300 hover:bg-teal-50 hover:text-teal-700"

@@ -8,6 +8,7 @@ import MinpakuBadge from "@/components/MinpakuBadge";
 import { WARD_ZONING_MAP } from "@/lib/data/wardZoning";
 import { getMinpakuInfo, getMinpakuBadgeType } from "@/lib/minpaku";
 import { getSiteUrl } from "@/lib/config";
+import { getSuumoRentSearchUrl } from "@/lib/propertyPortalLinks";
 
 const siteUrl = getSiteUrl();
 
@@ -67,30 +68,6 @@ function getCompetitionCount(prefecture: string): number {
   }
 }
 
-function getSuumoUrl(prefecture: string): string {
-  const map: Record<string, string> = {
-    "東京都": "https://suumo.jp/chintai/tokyo/",
-    "大阪府": "https://suumo.jp/chintai/osaka/",
-    "京都府": "https://suumo.jp/chintai/kyoto/",
-    "愛知県": "https://suumo.jp/chintai/aichi/",
-    "神奈川県": "https://suumo.jp/chintai/kanagawa/",
-    "兵庫県": "https://suumo.jp/chintai/hyogo/",
-    "福岡県": "https://suumo.jp/chintai/fukuoka/",
-    "北海道": "https://suumo.jp/chintai/hokkaido/",
-    "沖縄県": "https://suumo.jp/chintai/okinawa/",
-    "長野県": "https://suumo.jp/chintai/nagano/",
-    "奈良県": "https://suumo.jp/chintai/nara/",
-    "広島県": "https://suumo.jp/chintai/hiroshima/",
-    "千葉県": "https://suumo.jp/chintai/chiba/",
-    "宮城県": "https://suumo.jp/chintai/miyagi/",
-    "埼玉県": "https://suumo.jp/chintai/saitama/",
-    "熊本県": "https://suumo.jp/chintai/kumamoto/",
-    "栃木県": "https://suumo.jp/chintai/tochigi/",
-    "静岡県": "https://suumo.jp/chintai/shizuoka/",
-  };
-  return map[prefecture] ?? "https://suumo.jp/chintai/";
-}
-
 export default async function PrefectureAreaPage({ params }: PageProps) {
   const { prefecture: raw } = await params;
   const prefecture = decodeURIComponent(raw);
@@ -98,7 +75,7 @@ export default async function PrefectureAreaPage({ params }: PageProps) {
 
   const wards = WARD_ZONING_MAP.filter((w) => w.prefecture === prefecture);
   const competitionTotal = getCompetitionCount(prefecture);
-  const suumoUrl = getSuumoUrl(prefecture);
+  const suumoUrl = getSuumoRentSearchUrl(prefecture);
 
   const tokkuWards = wards.filter((w) => w.tokkuArea);
   const wardWithTypes = wards.map((w) => {
