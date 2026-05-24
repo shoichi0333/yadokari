@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { cleanEnvValue } from "@/lib/supabase";
+import { isAllowedAppUrl } from "@/lib/config";
 
 function getRegisterErrorMessage(message: string, status?: number, code?: string): string {
   const normalized = message.toLowerCase();
@@ -44,6 +45,7 @@ export async function POST(request: Request) {
   const email = typeof body?.email === "string" ? body.email.trim() : "";
   const password = typeof body?.password === "string" ? body.password : "";
   const name = typeof body?.name === "string" ? body.name.trim() : "";
+  const redirectTo = typeof body?.redirectTo === "string" ? body.redirectTo.trim() : "";
 
   if (!name) {
     return NextResponse.json({ error: "お名前を入力してください。" }, { status: 400 });
@@ -57,7 +59,13 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "パスワードは6文字以上で設定してください。" }, { status: 400 });
   }
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || new URL(request.url).origin;
+  const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || new URL(request.url).origin).replace(/\/$/, "");
+  const emailRedirectTo =
+    redirectTo.startsWith("/") && !redirectTo.startsWith("//")
+      ? `${siteUrl}${redirectTo}`
+      : redirectTo && isAllowedAppUrl(redirectTo)
+        ? redirectTo
+        : `${siteUrl}/auth/complete`;
   const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     auth: {
       persistSession: false,
@@ -72,7 +80,7 @@ export async function POST(request: Request) {
       data: {
         name,
       },
-      emailRedirectTo: `${siteUrl}/auth/complete`,
+      emailRedirectTo,
     },
   });
 

@@ -13,6 +13,13 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+select,
+select option {
+  background-color: #ffffff;
+  color: #111827;
+  color-scheme: light;
+}
+
 .line-clamp-1 {
   overflow: hidden;
   display: -webkit-box;

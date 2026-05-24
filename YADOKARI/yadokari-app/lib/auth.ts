@@ -64,7 +64,8 @@ export async function login(email: string, password: string): Promise<AuthUser |
 export async function register(
   email: string,
   password: string,
-  name: string
+  name: string,
+  redirectTo?: string
 ): Promise<AuthUser | null> {
   if (isSupabaseEnabled()) {
     const response = await fetch("/api/auth/register", {
@@ -72,7 +73,7 @@ export async function register(
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ email, password, name }),
+      body: JSON.stringify({ email, password, name, redirectTo }),
     });
 
     const data = (await response.json().catch(() => null)) as

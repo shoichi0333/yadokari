@@ -104,7 +104,7 @@ export default function PricingClient({
   const plans = getPlans({ standardPriceId, proPriceId });
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const source = searchParams.get("source");
   const reportAddress = searchParams.get("address") ?? "";
   const cameFromReport = source === "report";
@@ -117,18 +117,37 @@ export default function PricingClient({
     }
   }, [searchParams, router]);
 
+  function buildPricingReturnPath(planId: PaidPlanId) {
+    const params = new URLSearchParams();
+    params.set("plan", planId);
+    if (source) params.set("source", source);
+    if (reportAddress) params.set("address", reportAddress);
+    return `/pricing?${params.toString()}`;
+  }
+
   async function handleCheckout(plan: Plan) {
+    const paidPlanId = plan.id as PaidPlanId;
+
+    if (authLoading) return;
+
+    if (!user) {
+      const next = buildPricingReturnPath(paidPlanId);
+      router.push(`/auth/register?plan=${paidPlanId}&next=${encodeURIComponent(next)}`);
+      return;
+    }
+
     if (!checkoutAvailable || !plan.priceId) {
       alert("準備中です");
       return;
     }
 
     try {
-      setLoadingPlan(plan.id as PaidPlanId);
+      setLoadingPlan(paidPlanId);
       const origin = window.location.origin;
       const reportPath = reportAddress
         ? `/report?address=${encodeURIComponent(reportAddress)}`
         : "/report";
+      const reportSuccessPath = `${reportPath}${reportPath.includes("?") ? "&" : "?"}checkout=success&plan=${plan.id}`;
       const response = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -137,7 +156,7 @@ export default function PricingClient({
           planType: plan.id === "standard" ? "STANDARD" : "PRO",
           successUrl: `${origin}${
             cameFromReport
-              ? `${reportPath}&checkout=success&plan=${plan.id}`
+              ? reportSuccessPath
               : `/pricing?checkout=success&plan=${plan.id}`
           }`,
           cancelUrl: `${origin}${cameFromReport ? reportPath : "/pricing?checkout=cancel"}`,
@@ -268,7 +287,7 @@ export default function PricingClient({
                     <button
                       type="button"
                       onClick={() => void handleCheckout(plan)}
-                      disabled={!checkoutAvailable || !plan.priceId || loadingPlan === plan.id}
+                      disabled={authLoading || !checkoutAvailable || !plan.priceId || loadingPlan === plan.id}
                       className={[
                         "flex w-full items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-70",
                         !checkoutAvailable || !plan.priceId
@@ -278,9 +297,22 @@ export default function PricingClient({
                             : "border border-gray-200 bg-white text-gray-900 hover:border-teal-300 hover:text-teal-700",
                       ].join(" ")}
                     >
-                      {loadingPlan === plan.id ? "処理中..." : checkoutAvailable && plan.priceId ? plan.buttonLabel : "準備中"}
+                      {loadingPlan === plan.id
+                        ? "処理中..."
+                        : !checkoutAvailable || !plan.priceId
+                          ? "準備中"
+                          : authLoading
+                            ? "確認中..."
+                            : user
+                              ? plan.buttonLabel
+                              : "登録して申し込む"}
                       <ArrowRight size={16} />
                     </button>
+                    {checkoutAvailable && plan.priceId && !user && !authLoading && (
+                      <p className="mt-2 text-center text-xs text-gray-500">
+                        決済前に無料アカウント登録へ進みます。
+                      </p>
+                    )}
                     {(!checkoutAvailable || !plan.priceId) && (
                       <p className="mt-2 text-center text-xs text-gray-400">
                         決済設定が完了すると選択できます。
