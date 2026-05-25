@@ -139,7 +139,7 @@ export default function SubmitPropertyForm() {
             </span>
             <h1 className="mt-4 text-3xl font-bold tracking-tight text-slate-950">物件掲載申請</h1>
             <p className="mt-2 text-sm leading-6 text-slate-600">
-              民泊運用に適した物件情報を入力してください。内容確認後、掲載可否を審査します。
+              民泊運用に適した物件情報を入力してください。契約条件、転貸承諾、管理規約、用途地域などを確認したうえで掲載可否を審査します。
             </p>
           </div>
           <Link
@@ -179,7 +179,7 @@ export default function SubmitPropertyForm() {
               <div className="mb-4">
                 <h2 className="text-lg font-bold text-slate-950">掲載でできること</h2>
                 <p className="mt-1 text-sm leading-6 text-slate-600">
-                  物件情報を登録すると、YADOKARIが内容を確認したうえで公開可否をご連絡します。
+                  物件情報を登録すると、YADOKARIが内容を確認したうえで公開可否をご連絡します。外部リンク集とは別に、審査済み物件として扱います。
                 </p>
               </div>
               <div className="grid gap-3 md:grid-cols-3">

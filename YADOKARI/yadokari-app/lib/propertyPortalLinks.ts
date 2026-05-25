@@ -1,7 +1,3 @@
-function buildQuery(prefecture: string, areaName?: string) {
-  return [prefecture, areaName, "賃貸"].filter(Boolean).join(" ");
-}
-
 const SUUMO_AREA_CODES: Record<string, string> = {
   北海道: "010",
   青森県: "020",
@@ -52,8 +48,37 @@ const SUUMO_AREA_CODES: Record<string, string> = {
   沖縄県: "090",
 };
 
+const PREFECTURES = Object.keys(SUUMO_AREA_CODES);
+
+function normalizePrefecture(value: string) {
+  return PREFECTURES.find((prefecture) => value.startsWith(prefecture)) ?? value;
+}
+
+function normalizeAreaName(prefecture: string, areaName?: string) {
+  const normalizedPrefecture = normalizePrefecture(prefecture);
+  const candidates = [areaName, prefecture.slice(normalizedPrefecture.length)]
+    .map((value) => value?.trim())
+    .filter((value): value is string => Boolean(value));
+  const unique = Array.from(new Set(candidates));
+  const area = unique.find((value) => value !== normalizedPrefecture);
+
+  if (!area) return undefined;
+
+  const withoutPrefecture = area.startsWith(normalizedPrefecture)
+    ? area.slice(normalizedPrefecture.length).trim()
+    : area;
+
+  return withoutPrefecture || undefined;
+}
+
+function buildQuery(prefecture: string, areaName?: string) {
+  const normalizedPrefecture = normalizePrefecture(prefecture);
+  const normalizedAreaName = normalizeAreaName(prefecture, areaName);
+  return [normalizedPrefecture, normalizedAreaName, "賃貸"].filter(Boolean).join(" ");
+}
+
 function getSuumoAreaCode(prefecture: string) {
-  return SUUMO_AREA_CODES[prefecture] ?? "030";
+  return SUUMO_AREA_CODES[normalizePrefecture(prefecture)] ?? "030";
 }
 
 const ATHOME_PREFECTURE_SLUGS: Record<string, string> = {
@@ -121,7 +146,7 @@ const ATHOME_AREA_SEGMENTS: Record<string, string> = {
 };
 
 function getAthomePrefectureSlug(prefecture: string) {
-  return ATHOME_PREFECTURE_SLUGS[prefecture];
+  return ATHOME_PREFECTURE_SLUGS[normalizePrefecture(prefecture)];
 }
 
 export function getSuumoRentSearchUrl(prefecture: string, areaName?: string) {
@@ -131,13 +156,17 @@ export function getSuumoRentSearchUrl(prefecture: string, areaName?: string) {
 }
 
 export function getAthomeRentSearchUrl(prefecture: string, areaName?: string) {
-  const prefectureSlug = getAthomePrefectureSlug(prefecture);
+  const normalizedPrefecture = normalizePrefecture(prefecture);
+  const normalizedAreaName = normalizeAreaName(prefecture, areaName);
+  const prefectureSlug = getAthomePrefectureSlug(normalizedPrefecture);
 
   if (!prefectureSlug) {
     return "https://www.athome.co.jp/chintai/";
   }
 
-  const areaSegment = areaName ? ATHOME_AREA_SEGMENTS[`${prefecture}:${areaName}`] : undefined;
+  const areaSegment = normalizedAreaName
+    ? ATHOME_AREA_SEGMENTS[`${normalizedPrefecture}:${normalizedAreaName}`]
+    : undefined;
   if (areaSegment) {
     return `https://www.athome.co.jp/chintai/${prefectureSlug}/${areaSegment}/list/`;
   }

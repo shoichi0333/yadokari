@@ -14,8 +14,8 @@ type NavItem = {
 const navItems: NavItem[] = [
   { href: "/", label: "ホーム", icon: Home },
   { href: "/check", label: "可否チェック", icon: CheckSquare },
-  { href: "/properties", label: "物件を探す", icon: Building2 },
-  { href: "/map", label: "競合マップ", icon: Map },
+  { href: "/properties", label: "物件候補", icon: Building2 },
+  { href: "/map", label: "届出マップ", icon: Map },
   { href: "/pricing", label: "料金", icon: Crown },
 ];
 

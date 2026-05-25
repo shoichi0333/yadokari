@@ -189,8 +189,8 @@ export default function DashboardPage() {
               <MapPin size={20} />
             </span>
             <span>
-              <span className="block font-bold text-gray-900">競合マップ</span>
-              <span className="text-sm text-gray-500">届出住宅を地図で確認</span>
+              <span className="block font-bold text-gray-900">届出マップ</span>
+              <span className="text-sm text-gray-500">公式届出済み施設を地図で確認</span>
             </span>
           </span>
           <ArrowRight size={18} className="text-gray-300" />
@@ -205,8 +205,8 @@ export default function DashboardPage() {
               <Search size={20} />
             </span>
             <span>
-              <span className="block font-bold text-gray-900">物件を探す</span>
-              <span className="text-sm text-gray-500">条件・タグで絞り込んで検索</span>
+              <span className="block font-bold text-gray-900">物件候補</span>
+              <span className="text-sm text-gray-500">外部リンクとYADOKARI分析を見る</span>
             </span>
           </span>
           <ArrowRight size={18} className="text-gray-300" />

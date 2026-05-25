@@ -4,8 +4,8 @@ import type { Metadata } from "next";
 import MapLoader from "./MapLoader";
 
 export const metadata: Metadata = {
-  title: "競合マップ | YADOKARI",
-  description: "全国の民泊届出住宅をリアルタイムで地図表示。エリアの競合密度を把握して、民泊投資の有望エリアを絞り込めます。",
+  title: "公式届出済み民泊施設マップ | YADOKARI",
+  description: "全国の公式届出済み民泊施設を地図表示。実際に民泊運用されているエリアを把握し、周辺の賃貸物件探しへつなげられます。",
 };
 
 type RawListing = {
@@ -37,6 +37,7 @@ type CompetitionListing = {
 type AreaStats = {
   sourceId: string;
   name: string;
+  prefecture?: string;
   count: number;
 };
 
@@ -125,6 +126,7 @@ function loadListings(): ListingsResult {
     statsMap.set(sourceId, {
       sourceId,
       name: getAreaName(sourceId, listing),
+      prefecture: listing.prefecture,
       count: 1,
     });
   });
@@ -153,7 +155,7 @@ export default function MapPage() {
   return (
     <main className="flex min-h-screen flex-col bg-gray-50">
       <div className="flex h-10 shrink-0 items-center justify-between border-b border-gray-100 bg-white px-4 md:px-6">
-        <span className="text-sm font-semibold text-gray-700">競合マップ</span>
+        <span className="text-sm font-semibold text-gray-700">公式届出済み民泊施設マップ</span>
         <div className="flex items-center gap-2 text-xs text-gray-500">
           <span className="font-semibold text-teal-700">{listings.length.toLocaleString("ja-JP")}件</span>
           <span className="text-gray-300">/</span>
@@ -163,7 +165,7 @@ export default function MapPage() {
       {error ? (
         <div className="flex flex-1 items-center justify-center px-4 py-16">
           <div className="max-w-md rounded-2xl border border-amber-200 bg-white p-6 text-center shadow-sm">
-            <p className="text-base font-bold text-gray-900">競合マップを表示できません</p>
+            <p className="text-base font-bold text-gray-900">届出マップを表示できません</p>
             <p className="mt-3 text-sm leading-relaxed text-gray-600">
               {error} データ更新後に再度お試しください。
             </p>
@@ -174,7 +176,7 @@ export default function MapPage() {
           <div className="max-w-md rounded-2xl border border-gray-200 bg-white p-6 text-center shadow-sm">
             <p className="text-base font-bold text-gray-900">表示できる届出住宅データがありません</p>
             <p className="mt-3 text-sm leading-relaxed text-gray-600">
-              緯度経度付きの届出住宅データが追加されると、ここに競合マップが表示されます。
+              緯度経度付きの届出住宅データが追加されると、ここに届出マップが表示されます。
             </p>
           </div>
         </div>

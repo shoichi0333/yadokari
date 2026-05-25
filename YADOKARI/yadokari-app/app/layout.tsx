@@ -64,8 +64,9 @@ export default function RootLayout({
                   <p className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-3">ツール</p>
                   <ul className="space-y-2 text-sm">
                     <li><Link href="/check" className="hover:text-white transition-colors">可否チェッカー</Link></li>
-                    <li><Link href="/map" className="hover:text-white transition-colors">競合マップ</Link></li>
-                    <li><Link href="/properties" className="hover:text-white transition-colors">物件を探す</Link></li>
+                    <li><Link href="/map" className="hover:text-white transition-colors">届出マップ</Link></li>
+                    <li><Link href="/listings" className="hover:text-white transition-colors">届出施設一覧</Link></li>
+                    <li><Link href="/properties" className="hover:text-white transition-colors">物件候補リンク集</Link></li>
                     <li><Link href="/search" className="hover:text-white transition-colors">エリアを探す</Link></li>
                   </ul>
                 </div>

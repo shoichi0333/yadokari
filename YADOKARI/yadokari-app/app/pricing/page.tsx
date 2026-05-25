@@ -5,7 +5,7 @@ import { cleanEnvValue } from "@/lib/config";
 
 export const metadata: Metadata = {
   title: "料金プラン | YADOKARI",
-  description: "YADOKARIの料金プラン。無料・スタンダード・プロの3プランから選べます。民泊可否チェッカー・競合マップ・収益シミュレーター搭載。",
+  description: "YADOKARIの料金プラン。無料・スタンダード・プロの3プランから選べます。民泊可否チェッカー・届出マップ・収益シミュレーター搭載。",
   openGraph: {
     title: "料金プラン | YADOKARI",
     description: "YADOKARIの料金プラン。民泊投資に必要な情報をすべて揃えた3プランをご用意しています。",

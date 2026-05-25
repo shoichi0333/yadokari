@@ -42,13 +42,13 @@ export default function Header() {
               可否チェッカー
             </Link>
             <Link href="/properties" className="whitespace-nowrap text-sm text-gray-600 hover:text-teal-700 transition-colors">
-              物件を探す
+              物件候補
             </Link>
             <Link href="/search" className="whitespace-nowrap text-sm text-gray-600 hover:text-teal-700 transition-colors">
               エリアを探す
             </Link>
             <Link href="/map" className="whitespace-nowrap text-sm text-gray-600 hover:text-teal-700 transition-colors">
-              競合マップ
+              届出マップ
             </Link>
             <Link href="/blog" className="whitespace-nowrap text-sm text-gray-600 hover:text-teal-700 transition-colors">
               コラム
@@ -126,13 +126,13 @@ export default function Header() {
             可否チェッカー
           </Link>
           <Link href="/properties" className="block text-sm text-gray-700 py-2" onClick={() => setMenuOpen(false)}>
-            物件を探す
+            物件候補
           </Link>
           <Link href="/search" className="block text-sm text-gray-700 py-2" onClick={() => setMenuOpen(false)}>
             エリアを探す
           </Link>
           <Link href="/map" className="block text-sm text-gray-700 py-2" onClick={() => setMenuOpen(false)}>
-            競合マップ
+            届出マップ
           </Link>
           <Link href="/blog" className="block text-sm text-gray-700 py-2" onClick={() => setMenuOpen(false)}>
             コラム

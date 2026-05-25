@@ -407,7 +407,7 @@ function ResultCard({ result, mode }: { result: CheckResult; mode: "address" | "
           className="flex items-center justify-center gap-2 rounded-xl border border-gray-200 px-4 py-3 text-sm font-semibold text-gray-700 transition-colors hover:border-teal-200 hover:bg-teal-50 hover:text-teal-700"
         >
           <MapPin size={16} />
-          競合マップで確認
+          届出マップで確認
         </Link>
         {result.prefecture && result.ward && (
           <Link

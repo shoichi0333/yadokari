@@ -2,9 +2,11 @@
 
 import { useState, useMemo } from "react";
 import dynamic from "next/dynamic";
-import { MapPin, List, LayoutGrid, Filter } from "lucide-react";
+import Link from "next/link";
+import { ExternalLink, Filter, LayoutGrid, List, MapPin, Search } from "lucide-react";
 import MinpakuBadge from "@/components/MinpakuBadge";
 import type { ListingsData, MinpakuListing } from "@/lib/data/listings";
+import { getAthomeRentSearchUrl, getSuumoRentSearchUrl } from "@/lib/propertyPortalLinks";
 
 // Leafletはサーバーサイドレンダリング不可のため動的インポート
 const ListingsMap = dynamic(() => import("./ListingsMap"), { ssr: false });
@@ -19,6 +21,12 @@ const TYPE_OPTIONS = [
   { value: "TOKKU", label: "特区民泊" },
   { value: "RYOKAN", label: "旅館業" },
 ];
+
+function getListingAreaKeyword(listing: MinpakuListing) {
+  const rest = listing.address.replace(listing.prefecture, "").trim();
+  const match = rest.match(/^(.+?[市区町村])/);
+  return match?.[1] ?? rest.slice(0, 12) ?? listing.address;
+}
 
 export default function ListingsClient({ data }: Props) {
   const [view, setView] = useState<"map" | "list">("map");
@@ -76,13 +84,13 @@ export default function ListingsClient({ data }: Props) {
             <div>
               <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
                 <MapPin size={22} className="text-teal-600" />
-                届出住宅マップ
+                公式届出済み民泊施設一覧/マップ
               </h1>
               <p className="text-gray-500 text-sm mt-1">
-                住宅宿泊事業法に基づき届出された民泊施設 — 政府オープンデータより
+                公式に届出・許可・認定された民泊施設を確認し、周辺の賃貸物件探しへつなげます。
               </p>
             </div>
-            <div className="flex items-center gap-3 text-sm text-gray-400">
+          <div className="flex items-center gap-3 text-sm text-gray-400">
               <span>データ更新: {updatedDate}</span>
             </div>
           </div>
@@ -101,6 +109,11 @@ export default function ListingsClient({ data }: Props) {
               value={`${data.listings.filter((l) => l.minpakuType !== "JUUTAKU").length}件`}
               color="orange"
             />
+          </div>
+
+          <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs leading-5 text-amber-900">
+            ここに表示されるのは「すでに届出・許可・認定された施設」です。現在空いている民泊可物件ではありません。
+            空き物件候補は「この周辺で賃貸を探す」または物件リンク集から確認してください。
           </div>
         </div>
       </div>
@@ -209,6 +222,34 @@ export default function ListingsClient({ data }: Props) {
                     <span>都道府県</span>
                     <span className="text-gray-600">{selected.prefecture}</span>
                   </div>
+                </div>
+                <div className="mt-4 space-y-2 border-t border-gray-50 pt-4">
+                  <p className="text-xs font-bold text-gray-900">この周辺で賃貸を探す</p>
+                  <a
+                    href={getSuumoRentSearchUrl(selected.prefecture, getListingAreaKeyword(selected))}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex w-full items-center justify-center gap-1.5 rounded-lg bg-teal-600 px-3 py-2 text-xs font-semibold text-white transition-colors hover:bg-teal-700"
+                  >
+                    SUUMOで探す
+                    <ExternalLink size={12} />
+                  </a>
+                  <a
+                    href={getAthomeRentSearchUrl(selected.prefecture, getListingAreaKeyword(selected))}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex w-full items-center justify-center gap-1.5 rounded-lg border border-teal-200 bg-white px-3 py-2 text-xs font-semibold text-teal-700 transition-colors hover:bg-teal-50"
+                  >
+                    アットホームで探す
+                    <ExternalLink size={12} />
+                  </a>
+                  <Link
+                    href={`/check?address=${encodeURIComponent(selected.address)}`}
+                    className="flex w-full items-center justify-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs font-semibold text-gray-700 transition-colors hover:bg-gray-50"
+                  >
+                    YADOKARIで周辺分析
+                    <Search size={12} />
+                  </Link>
                 </div>
               </div>
             )}

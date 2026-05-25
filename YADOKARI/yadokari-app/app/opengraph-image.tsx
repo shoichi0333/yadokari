@@ -148,7 +148,7 @@ export default function Image() {
                   fontWeight: 700,
                 }}
               >
-                可否判定・競合マップ・収益試算をまとめて確認
+                可否判定・届出マップ・収益試算をまとめて確認
               </div>
             </div>
             <div

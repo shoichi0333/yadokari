@@ -112,7 +112,7 @@ export default async function PrefectureAreaPage({ params }: PageProps) {
             name: `${prefecture}の民泊届出住宅は何件ありますか？`,
             acceptedAnswer: {
               "@type": "Answer",
-              text: `YADOKARIの届出データによると${prefecture}には${competitionTotal > 0 ? `${competitionTotal.toLocaleString("ja-JP")}件` : "複数"}の届出住宅が登録されています。競合マップでリアルタイムに確認できます。`,
+              text: `YADOKARIの届出データによると${prefecture}には${competitionTotal > 0 ? `${competitionTotal.toLocaleString("ja-JP")}件` : "複数"}の届出住宅が登録されています。届出マップでリアルタイムに確認できます。`,
             },
           },
           {
@@ -120,7 +120,7 @@ export default async function PrefectureAreaPage({ params }: PageProps) {
             name: `${prefecture}で民泊投資を始めるにはどうすればいいですか？`,
             acceptedAnswer: {
               "@type": "Answer",
-              text: `まずYADOKARIの可否チェッカーで投資したい物件の住所を入力し、住宅宿泊・特区民泊・旅館業の可否を確認します。次に競合マップで周辺の届出住宅数を把握し、収益シミュレーターで収益性を試算してから物件探しを始めましょう。`,
+              text: `まずYADOKARIの可否チェッカーで投資したい物件の住所を入力し、住宅宿泊・特区民泊・旅館業の可否を確認します。次に届出マップで周辺の届出住宅数を把握し、収益シミュレーターで収益性を試算してから物件探しを始めましょう。`,
             },
           },
         ],

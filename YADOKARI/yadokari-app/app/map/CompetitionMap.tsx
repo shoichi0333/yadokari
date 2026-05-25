@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import Link from "next/link";
-import { getSuumoRentSearchUrl } from "@/lib/propertyPortalLinks";
+import { getAthomeRentSearchUrl, getSuumoRentSearchUrl } from "@/lib/propertyPortalLinks";
 
 export type CompetitionListing = {
   id: string;
@@ -17,6 +17,7 @@ export type CompetitionListing = {
 export type AreaStats = {
   sourceId: string;
   name: string;
+  prefecture?: string;
   count: number;
 };
 
@@ -32,6 +33,13 @@ function escapeHtml(value: string) {
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#39;");
+}
+
+function getListingAreaKeyword(listing: CompetitionListing) {
+  if (!listing.prefecture) return listing.address;
+  const rest = listing.address.replace(listing.prefecture, "").trim();
+  const match = rest.match(/^(.+?[市区町村])/);
+  return match?.[1] ?? rest.slice(0, 12) ?? listing.address;
 }
 
 export default function CompetitionMap({ listings, areaStats }: Props) {
@@ -55,6 +63,9 @@ export default function CompetitionMap({ listings, areaStats }: Props) {
       }).addTo(map);
 
       listings.forEach((listing) => {
+        const rentUrl = listing.prefecture
+          ? getSuumoRentSearchUrl(listing.prefecture, getListingAreaKeyword(listing))
+          : "/properties";
         const marker = L.circleMarker([listing.lat, listing.lng], {
           radius: 5,
           fillColor:
@@ -77,6 +88,7 @@ export default function CompetitionMap({ listings, areaStats }: Props) {
               <div style="font-size:11px;color:#6b7280">${escapeHtml(
                 listing.prefecture || ""
               )}</div>
+              <a href="${escapeHtml(rentUrl)}" target="_blank" rel="noreferrer" style="display:inline-block;margin-top:8px;color:#0f766e;font-size:12px;font-weight:700;text-decoration:none">この周辺で賃貸を探す</a>
             </div>`,
             { maxWidth: 240 }
           ).openPopup();
@@ -111,7 +123,7 @@ export default function CompetitionMap({ listings, areaStats }: Props) {
             エリア別 届出件数
           </h2>
           <div className="mb-5 space-y-2 rounded-xl border border-teal-100 bg-teal-50 p-3">
-            <p className="text-xs font-semibold text-teal-800">このエリアで次のアクション</p>
+            <p className="text-xs font-semibold text-teal-800">公式データから次のアクション</p>
             <Link
               href="/check"
               className="flex w-full items-center justify-center gap-1.5 rounded-lg bg-teal-600 px-3 py-2 text-xs font-semibold text-white transition-colors hover:bg-teal-700"
@@ -122,13 +134,14 @@ export default function CompetitionMap({ listings, areaStats }: Props) {
               href="/properties"
               className="flex w-full items-center justify-center gap-1.5 rounded-lg border border-teal-200 bg-white px-3 py-2 text-xs font-semibold text-teal-700 transition-colors hover:bg-teal-50"
             >
-              物件を探す
+              民泊向き物件候補を見る
             </Link>
           </div>
 
           <div className="space-y-4">
             {areaStats.map((area) => {
-              const link = getSuumoRentSearchUrl(area.name);
+              const suumoLink = getSuumoRentSearchUrl(area.prefecture ?? area.name, area.name);
+              const athomeLink = getAthomeRentSearchUrl(area.prefecture ?? area.name, area.name);
               return (
                 <div key={area.sourceId} className="space-y-2">
                   <div className="flex items-center justify-between gap-3">
@@ -136,16 +149,24 @@ export default function CompetitionMap({ listings, areaStats }: Props) {
                       <div className="truncate text-sm font-semibold text-gray-900">
                         {area.name}
                       </div>
-                      {link ? (
+                      <div className="flex items-center gap-2">
                         <a
-                          href={link}
+                          href={suumoLink}
                           target="_blank"
                           rel="noreferrer"
                           className="text-xs font-medium text-teal-700 hover:text-teal-800"
                         >
                           SUUMO
                         </a>
-                      ) : null}
+                        <a
+                          href={athomeLink}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-xs font-medium text-teal-700 hover:text-teal-800"
+                        >
+                          アットホーム
+                        </a>
+                      </div>
                     </div>
                     <span className="shrink-0 rounded-full bg-teal-50 px-2.5 py-1 text-xs font-bold text-teal-700">
                       {area.count.toLocaleString("ja-JP")}

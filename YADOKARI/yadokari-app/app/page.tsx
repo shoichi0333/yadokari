@@ -16,14 +16,14 @@ export const metadata: Metadata = {
   description: "住所1つで民泊の可否を即判定。住宅宿泊事業・特区民泊・旅館業の3タイプを自動判別し、競合届出住宅数・収益試算まで無料で確認できます。全国2,000件超のデータ掲載。",
   openGraph: {
     title: "YADOKARI | 民泊可否チェック・競合分析・収益試算",
-    description: "住所1つで民泊可否を即判定。競合マップ・収益シミュレーター搭載。全国対応・無料で使えます。",
+    description: "住所1つで民泊可否を即判定。届出マップ・収益シミュレーター搭載。全国対応・無料で使えます。",
     type: "website",
     url: siteUrl,
   },
   twitter: {
     card: "summary_large_image",
     title: "YADOKARI | 民泊可否チェック・競合分析・収益試算",
-    description: "住所1つで民泊可否を即判定。競合マップ・収益シミュレーター搭載。",
+    description: "住所1つで民泊可否を即判定。届出マップ・収益シミュレーター搭載。",
   },
 };
 
@@ -97,7 +97,7 @@ const faqJsonLd = {
       name: 'どのエリアが民泊に向いていますか？',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: '東京都港区・台東区（浅草）・渋谷区、大阪市中央区・浪速区（難波）、京都市下京区・東山区（祇園）、沖縄県那覇市などが民泊の需要が高いエリアです。競合届出住宅数や稼働率を考慮してエリアを選ぶことが重要で、YADOKARIの競合マップで詳細を確認できます。',
+        text: '東京都港区・台東区（浅草）・渋谷区、大阪市中央区・浪速区（難波）、京都市下京区・東山区（祇園）、沖縄県那覇市などが民泊の需要が高いエリアです。競合届出住宅数や稼働率を考慮してエリアを選ぶことが重要で、YADOKARIの届出マップで詳細を確認できます。',
       },
     },
   ],
@@ -151,8 +151,8 @@ export default function TopPage() {
               可否チェッカーを試す
             </Link>
             {[
-              { href: "/map", label: "競合マップを見る" },
-              { href: "/properties", label: "物件を探す" },
+              { href: "/map", label: "届出マップを見る" },
+              { href: "/properties", label: "物件候補を見る" },
             ].map((item) => (
               <Link
                 key={item.href}
@@ -221,16 +221,16 @@ export default function TopPage() {
             <SegmentCard
               icon={<TrendingUp size={24} />}
               title="不動産投資家"
-              description="収益シミュレーターで実質利回りを試算。競合マップで供給過多エリアを事前に回避できます"
-              ctaLabel="競合マップを見る"
+              description="収益シミュレーターで実質利回りを試算。届出マップで供給過多エリアを事前に回避できます"
+              ctaLabel="届出マップを見る"
               href="/map"
               accent="emerald"
             />
             <SegmentCard
               icon={<Briefcase size={24} />}
               title="民泊可能物件を探す法人"
-              description="社員研修・福利厚生用の民泊物件を全国から条件検索。住宅宿泊・旅館業対応物件を一覧で確認"
-              ctaLabel="物件一覧を見る"
+              description="公式届出済み施設の周辺から、外部の民泊可・相談可物件候補へ進めます"
+              ctaLabel="物件候補を見る"
               href="/properties"
               accent="purple"
             />
@@ -257,7 +257,7 @@ export default function TopPage() {
             />
             <FeatureCard
               icon={<MapPin className="text-teal-600" size={28} />}
-              title="競合マップで戦略立案"
+              title="届出マップで戦略立案"
               description="政府公開の届出住宅データをリアルタイム表示。エリアの競合密度を把握して、差別化戦略を立てられます。"
             />
           </div>
@@ -275,7 +275,7 @@ export default function TopPage() {
               icon={<MapPin className="text-teal-600" size={28} />}
               step="01"
               title="エリアを選ぶ"
-              description="競合マップで届出住宅の密度を確認。収益が見込めるエリアを絞り込む。"
+              description="届出マップで届出住宅の密度を確認。収益が見込めるエリアを絞り込む。"
             />
             <StepCard
               icon={<Shield className="text-teal-600" size={28} />}
@@ -385,39 +385,47 @@ export default function TopPage() {
         </div>
       </section>
 
-      {/* おすすめ物件 */}
+      {/* 物件候補 */}
       <section className="py-12 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h2 className="text-2xl font-bold text-gray-900">おすすめ民泊物件</h2>
-              <p className="text-gray-500 text-sm mt-1">住宅宿泊・特区・旅館業対応の物件をタイプ別に確認</p>
+              <h2 className="text-2xl font-bold text-gray-900">民泊向き物件候補</h2>
+              <p className="text-gray-500 text-sm mt-1">公式届出済み施設の周辺から、外部掲載元の空き物件候補へ進めます</p>
             </div>
             <Link href="/properties" className="inline-flex items-center gap-1.5 text-sm font-semibold text-teal-700 hover:text-teal-900">
-              全件を見る <ArrowRight size={14} />
+              リンク集を見る <ArrowRight size={14} />
             </Link>
           </div>
-          <div className="rounded-2xl border border-dashed border-teal-200 bg-white px-6 py-10 text-center">
-            <Building2 size={36} className="mx-auto mb-4 text-teal-600" />
-            <h3 className="text-lg font-bold text-gray-900">掲載物件は審査済みデータへ切り替え中です</h3>
-            <p className="mx-auto mt-3 max-w-2xl text-sm leading-6 text-gray-600">
-              本番公開後に架空物件や古いシードデータが表示されないよう、物件カードの公開を一時停止しています。
-              民泊可否チェック、詳細レポート、競合マップはそのまま利用できます。
-            </p>
-            <div className="mt-6 flex flex-wrap justify-center gap-3">
-              <Link
-                href="/submit-property"
-                className="inline-flex items-center gap-2 rounded-full bg-teal-600 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-teal-700"
-              >
-                物件掲載を申請する
-                <ArrowRight size={14} />
+          <div className="grid gap-4 md:grid-cols-3">
+            <div className="rounded-2xl border border-teal-100 bg-white p-6 shadow-sm">
+              <Database size={30} className="mb-4 text-teal-600" />
+              <h3 className="text-base font-bold text-gray-900">公式届出済み施設を見る</h3>
+              <p className="mt-2 text-sm leading-6 text-gray-600">
+                実際に民泊運用されている施設の分布から、需要と競合を確認します。
+              </p>
+              <Link href="/map" className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-teal-700">
+                届出マップへ <ArrowRight size={14} />
               </Link>
-              <Link
-                href="/map"
-                className="inline-flex items-center gap-2 rounded-full border border-teal-200 bg-white px-5 py-2.5 text-sm font-semibold text-teal-700 transition-colors hover:bg-teal-50"
-              >
-                競合マップを見る
-                <ArrowRight size={14} />
+            </div>
+            <div className="rounded-2xl border border-teal-100 bg-white p-6 shadow-sm">
+              <Building2 size={30} className="mb-4 text-teal-600" />
+              <h3 className="text-base font-bold text-gray-900">外部の民泊可物件を探す</h3>
+              <p className="mt-2 text-sm leading-6 text-gray-600">
+                民泊可・相談可の外部掲載元へ進み、YADOKARIで可否と収益性を確認します。
+              </p>
+              <Link href="/properties" className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-teal-700">
+                物件候補へ <ArrowRight size={14} />
+              </Link>
+            </div>
+            <div className="rounded-2xl border border-teal-100 bg-white p-6 shadow-sm">
+              <Shield size={30} className="mb-4 text-teal-600" />
+              <h3 className="text-base font-bold text-gray-900">YADOKARI確認済みへ育てる</h3>
+              <p className="mt-2 text-sm leading-6 text-gray-600">
+                物件掲載は審査制で受け付け、外部リンクとは別に確認済み候補として扱います。
+              </p>
+              <Link href="/submit-property" className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-teal-700">
+                掲載申請へ <ArrowRight size={14} />
               </Link>
             </div>
           </div>
@@ -454,7 +462,7 @@ export default function TopPage() {
               <Database size={24} className="text-white" />
             </div>
             <div>
-              <h2 className="text-xl font-bold mb-1">競合マップで分析する <span className="text-xs bg-white/20 rounded-full px-2 py-0.5 align-middle">NEW</span></h2>
+              <h2 className="text-xl font-bold mb-1">公式届出済み施設マップで分析する <span className="text-xs bg-white/20 rounded-full px-2 py-0.5 align-middle">NEW</span></h2>
               <p className="text-teal-100 text-sm leading-relaxed">
                 政府公開の届出住宅データを地図上に可視化。東京都港区843件・静岡県498件など、エリア別の競合密度を把握できます。
               </p>
@@ -464,7 +472,7 @@ export default function TopPage() {
             href="/map"
             className="flex-shrink-0 flex items-center gap-2 bg-white text-teal-700 font-semibold px-6 py-3 rounded-xl hover:bg-teal-50 transition-colors text-sm"
           >
-            競合マップを見る <ArrowRight size={16} />
+            届出マップを見る <ArrowRight size={16} />
           </Link>
         </div>
       </section>
