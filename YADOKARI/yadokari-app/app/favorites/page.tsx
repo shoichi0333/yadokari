@@ -2,11 +2,21 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ArrowLeft, FileText, History, MapPin, CheckCircle2, XCircle, Trash2 } from "lucide-react";
+import { useAuth } from "@/lib/AuthContext";
 import { getCheckHistory, clearCheckHistory, type CheckHistoryEntry } from "@/lib/checkHistory";
 
 export default function FavoritesPage() {
+  const router = useRouter();
+  const { user, loading, plan } = useAuth();
   const [history, setHistory] = useState<CheckHistoryEntry[]>([]);
+
+  useEffect(() => {
+    if (!loading && !user) {
+      router.replace("/auth/login?next=/favorites");
+    }
+  }, [loading, router, user]);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -16,6 +26,14 @@ export default function FavoritesPage() {
   function handleClear() {
     clearCheckHistory();
     setHistory([]);
+  }
+
+  if (loading || !user) {
+    return (
+      <div className="mx-auto flex min-h-[60vh] max-w-3xl items-center justify-center px-4">
+        <p className="text-sm text-gray-500">読み込み中...</p>
+      </div>
+    );
   }
 
   return (
@@ -30,6 +48,9 @@ export default function FavoritesPage() {
             <h1 className="text-xl font-bold text-gray-900">チェック履歴</h1>
           </div>
           <span className="text-sm text-gray-400">{history.length}件</span>
+          <span className="rounded-full bg-teal-50 px-2.5 py-1 text-xs font-bold text-teal-700">
+            {plan === "free" ? "無料: 3件まで" : "有料: 拡張履歴"}
+          </span>
         </div>
         {history.length > 0 && (
           <button

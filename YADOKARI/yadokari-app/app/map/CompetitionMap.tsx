@@ -2,6 +2,8 @@
 
 import { useEffect, useRef } from "react";
 import Link from "next/link";
+import { BarChart3, Crown, Download, Lock, SlidersHorizontal } from "lucide-react";
+import { useAuth } from "@/lib/AuthContext";
 import { getAthomeRentSearchUrl, getSuumoRentSearchUrl } from "@/lib/propertyPortalLinks";
 
 export type CompetitionListing = {
@@ -43,10 +45,12 @@ function getListingAreaKeyword(listing: CompetitionListing) {
 }
 
 export default function CompetitionMap({ listings, areaStats }: Props) {
+  const { plan } = useAuth();
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<unknown>(null);
   const markersRef = useRef<unknown[]>([]);
   const maxCount = Math.max(...areaStats.map((area) => area.count), 1);
+  const advancedUnlocked = plan === "standard" || plan === "pro";
 
   useEffect(() => {
     if (!mapRef.current || mapInstanceRef.current) return;
@@ -136,6 +140,61 @@ export default function CompetitionMap({ listings, areaStats }: Props) {
             >
               民泊向き物件候補を見る
             </Link>
+          </div>
+
+          <div className={`mb-5 rounded-xl border p-3 ${
+            advancedUnlocked ? "border-teal-100 bg-white" : "border-amber-200 bg-amber-50"
+          }`}>
+            <div className="mb-3 flex items-center gap-2">
+              {advancedUnlocked ? (
+                <Crown size={14} className="text-teal-700" />
+              ) : (
+                <Lock size={14} className="text-amber-700" />
+              )}
+              <p className={`text-xs font-bold ${advancedUnlocked ? "text-teal-800" : "text-amber-900"}`}>
+                詳細フィルタ・比較・PDF
+              </p>
+            </div>
+            <div className="grid gap-2">
+              {advancedUnlocked ? (
+                <>
+                  <Link
+                    href="/listings"
+                    className="flex items-center justify-center gap-1.5 rounded-lg border border-teal-100 bg-teal-50 px-3 py-2 text-xs font-semibold text-teal-700 transition-colors hover:bg-teal-100"
+                  >
+                    <SlidersHorizontal size={13} />
+                    詳細フィルタ
+                  </Link>
+                  <Link
+                    href="/search"
+                    className="flex items-center justify-center gap-1.5 rounded-lg border border-teal-100 bg-teal-50 px-3 py-2 text-xs font-semibold text-teal-700 transition-colors hover:bg-teal-100"
+                  >
+                    <BarChart3 size={13} />
+                    エリア比較
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={() => window.print()}
+                    className="flex items-center justify-center gap-1.5 rounded-lg bg-gray-900 px-3 py-2 text-xs font-semibold text-white transition-colors hover:bg-gray-800"
+                  >
+                    <Download size={13} />
+                    PDF保存
+                  </button>
+                </>
+              ) : (
+                <>
+                  <p className="text-xs leading-5 text-amber-900">
+                    地図閲覧は無料です。詳細フィルタ、エリア比較、PDF保存は有料プランで使えます。
+                  </p>
+                  <Link
+                    href="/pricing?source=map"
+                    className="flex items-center justify-center gap-1.5 rounded-lg bg-gray-900 px-3 py-2 text-xs font-semibold text-white transition-colors hover:bg-gray-800"
+                  >
+                    有料機能を解放
+                  </Link>
+                </>
+              )}
+            </div>
           </div>
 
           <div className="space-y-4">

@@ -17,6 +17,7 @@ import {
   PROPERTY_LINK_DISCLAIMERS,
   type ExternalMinpakuPropertyLink,
 } from "@/lib/data/externalMinpakuPropertyLinks";
+import { PropertyAnalysisCta, PropertyAnalysisPanel } from "./PropertyAnalysisGate";
 
 export const metadata: Metadata = {
   title: "民泊向き物件候補・外部リンク集 | YADOKARI",
@@ -95,6 +96,8 @@ export default function PropertiesPage() {
           ))}
         </div>
       </section>
+
+      <PropertyAnalysisPanel />
 
       <section className="border-y border-gray-100 bg-white">
         <div className="mx-auto grid max-w-7xl gap-6 px-4 py-10 sm:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:px-8">
@@ -186,6 +189,7 @@ function ExternalPropertyCard({ item }: { item: ExternalMinpakuPropertyLink }) {
         掲載元で見る
         <ExternalLink size={15} />
       </a>
+      <PropertyAnalysisCta className="mt-3 w-full" />
     </article>
   );
 }

@@ -1,8 +1,8 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   ArrowRight,
   Building2,
@@ -18,9 +18,17 @@ import {
   TrendingUp,
 } from "lucide-react";
 import MinpakuBadge from "@/components/MinpakuBadge";
-import { getCurrentPlan, normalizePlanId, PLAN_LABELS, setCurrentPlan, type PlanId } from "@/lib/plan";
-import { saveReport, syncSavedReport } from "@/lib/savedReports";
+import { getCurrentPlan, getPlanLimits, normalizePlanId, PLAN_LABELS, setCurrentPlan, type PlanId } from "@/lib/plan";
+import { getSavedReports, saveReport, syncSavedReport } from "@/lib/savedReports";
 import { useAuth } from "@/lib/AuthContext";
+import { getAuthFetchHeaders } from "@/lib/authFetch";
+import {
+  canRunCheck,
+  getCheckUsageSnapshot,
+  recordCheckUsage,
+  syncServerCheckUsage,
+  type CheckUsageSnapshot,
+} from "@/lib/usageLimits";
 
 type CheckResult = {
   address: string;
@@ -37,6 +45,7 @@ type CheckResult = {
   competitionCount?: number;
   message?: string;
   error?: string;
+  usage?: CheckUsageSnapshot;
 };
 
 function getPotentialScore(result: CheckResult) {
@@ -91,28 +100,44 @@ function getRecommendedType(result: CheckResult) {
 }
 
 export default function ReportClient() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const initialAddress = searchParams.get("address") ?? "";
   const checkoutSuccess = searchParams.get("checkout") === "success";
+  const initialLoadDone = useRef(false);
   const [address, setAddress] = useState(initialAddress);
   const [result, setResult] = useState<CheckResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [plan, setPlan] = useState<PlanId>("free");
   const [saved, setSaved] = useState(false);
-  const { user } = useAuth();
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [usage, setUsage] = useState<CheckUsageSnapshot>(() => getCheckUsageSnapshot("free"));
+  const { user, plan: authPlan, loading: authLoading } = useAuth();
 
   async function loadReport(targetAddress: string) {
     const value = targetAddress.trim();
     if (!value || loading) return;
+    const checkoutPlan = normalizePlanId(searchParams.get("plan"));
+    const effectivePlan = checkoutSuccess && checkoutPlan !== "free" ? checkoutPlan : authPlan;
+
+    if (!canRunCheck(effectivePlan)) {
+      const snapshot = getCheckUsageSnapshot(effectivePlan);
+      setUsage(snapshot);
+      setError(`無料チェックは本日${snapshot.limit ?? 0}回までです。詳細レポートの作成を続けるには有料プランをご利用ください。`);
+      return;
+    }
 
     setLoading(true);
     setError(null);
     setResult(null);
 
     try {
-      const response = await fetch(`/api/check-minpaku?address=${encodeURIComponent(value)}`);
+      const response = await fetch(`/api/check-minpaku?address=${encodeURIComponent(value)}`, {
+        headers: await getAuthFetchHeaders(),
+      });
       const data = (await response.json()) as CheckResult;
+      setUsage(syncServerCheckUsage(effectivePlan, data.usage));
 
       if (!response.ok || data.error) {
         setError(data.error ?? "レポートを作成できませんでした。");
@@ -120,6 +145,9 @@ export default function ReportClient() {
       }
 
       setResult(data);
+      if (!data.usage) {
+        setUsage(recordCheckUsage(effectivePlan));
+      }
       setSaved(false);
     } catch {
       setError("通信エラーが発生しました。時間をおいて再度お試しください。");
@@ -139,12 +167,26 @@ export default function ReportClient() {
       Promise.resolve().then(() => setPlan(currentPlan));
     }
 
-    if (initialAddress) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      void loadReport(initialAddress);
-    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    if (!checkoutSuccess) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setPlan(authPlan);
+      setUsage(getCheckUsageSnapshot(authPlan));
+    }
+  }, [authPlan, checkoutSuccess]);
+
+  useEffect(() => {
+    if (!initialAddress || initialLoadDone.current) return;
+    if (authLoading && !checkoutSuccess) return;
+
+    initialLoadDone.current = true;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    void loadReport(initialAddress);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authLoading, checkoutSuccess, initialAddress, plan]);
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -162,6 +204,21 @@ export default function ReportClient() {
   function handleSaveReport() {
     if (!result || !reportUnlocked) return;
 
+    if (!user) {
+      const next = `/report?address=${encodeURIComponent(result.address)}`;
+      router.push(`/auth/login?next=${encodeURIComponent(next)}`);
+      return;
+    }
+
+    const saveLimit = getPlanLimits(plan).savedReports;
+    const existingReports = getSavedReports();
+    const isUpdatingExisting = existingReports.some((item) => item.address === result.address);
+
+    if (saveLimit !== null && !isUpdatingExisting && existingReports.length >= saveLimit) {
+      setSaveError(`現在のプランでは保存レポートは${saveLimit}件までです。`);
+      return;
+    }
+
     const report = {
       address: result.address,
       prefecture: result.prefecture,
@@ -177,6 +234,7 @@ export default function ReportClient() {
       void syncSavedReport(user.email, report);
     }
     setSaved(true);
+    setSaveError(null);
   }
 
   return (
@@ -206,12 +264,15 @@ export default function ReportClient() {
               />
               <button
                 type="submit"
-                disabled={loading}
+                disabled={loading || authLoading || usage.isLimitReached}
                 className="rounded-xl bg-teal-600 px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-teal-700 disabled:cursor-not-allowed disabled:bg-teal-300"
               >
                 {loading ? "作成中" : "作成"}
               </button>
             </form>
+            <p className="text-xs font-semibold text-gray-400 lg:text-right">
+              {usage.limit === null ? "有料プラン: 作成回数無制限" : `本日の無料チェック: ${usage.used}/${usage.limit}回`}
+            </p>
           </div>
         </div>
       </section>
@@ -331,7 +392,7 @@ export default function ReportClient() {
                       onClick={handleSaveReport}
                       className="flex w-full items-center justify-center gap-2 rounded-xl bg-teal-600 px-4 py-3 text-sm font-bold text-white transition-colors hover:bg-teal-700"
                     >
-                      {saved ? "保存しました" : "ダッシュボードに保存"}
+                      {!user ? "ログインして保存" : saved ? "保存しました" : "ダッシュボードに保存"}
                       <Save size={15} />
                     </button>
                     <button
@@ -342,6 +403,7 @@ export default function ReportClient() {
                       印刷・PDF保存
                       <Download size={15} />
                     </button>
+                    {saveError && <p className="text-xs font-semibold text-red-600">{saveError}</p>}
                   </div>
                 ) : (
                   <Link

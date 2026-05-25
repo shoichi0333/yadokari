@@ -1,10 +1,15 @@
 export type PlanId = "free" | "standard" | "pro";
 
 export type PlanLimit = {
+  checksPerDay: number | null;
   favorites: number | null;
+  history: number | null;
+  savedReports: number | null;
   listings: number;
   revenueSimulator: "basic" | "detailed";
   notifications: boolean;
+  propertyAnalysis: boolean;
+  mapAdvanced: boolean;
 };
 
 export const PLAN_LABELS: Record<PlanId, string> = {
@@ -15,22 +20,37 @@ export const PLAN_LABELS: Record<PlanId, string> = {
 
 export const PLAN_LIMITS: Record<Uppercase<PlanId>, PlanLimit> = {
   FREE: {
+    checksPerDay: 3,
     favorites: 3,
+    history: 3,
+    savedReports: 0,
     listings: 0,
     revenueSimulator: "basic",
     notifications: false,
+    propertyAnalysis: false,
+    mapAdvanced: false,
   },
   STANDARD: {
+    checksPerDay: 100,
     favorites: null,
+    history: 50,
+    savedReports: 50,
     listings: 0,
     revenueSimulator: "detailed",
     notifications: true,
+    propertyAnalysis: true,
+    mapAdvanced: true,
   },
   PRO: {
+    checksPerDay: null,
     favorites: null,
+    history: null,
+    savedReports: null,
     listings: 5,
     revenueSimulator: "detailed",
     notifications: true,
+    propertyAnalysis: true,
+    mapAdvanced: true,
   },
 };
 

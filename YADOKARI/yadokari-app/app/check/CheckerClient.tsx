@@ -23,7 +23,15 @@ import {
 import MinpakuBadge from "@/components/MinpakuBadge";
 import { saveCheckHistory, syncCheckHistory } from "@/lib/checkHistory";
 import { useAuth } from "@/lib/AuthContext";
+import { getAuthFetchHeaders } from "@/lib/authFetch";
 import { getSuumoRentSearchUrl } from "@/lib/propertyPortalLinks";
+import {
+  canRunCheck,
+  getCheckUsageSnapshot,
+  recordCheckUsage,
+  syncServerCheckUsage,
+  type CheckUsageSnapshot,
+} from "@/lib/usageLimits";
 
 const CheckerMap = dynamic(() => import("./CheckerMap"), { ssr: false });
 
@@ -53,6 +61,7 @@ type CheckResult = {
   message?: string;
   error?: string;
   propertyDetails?: PropertyDetails;
+  usage?: CheckUsageSnapshot;
 };
 
 type FetchPropertyResult = PropertyDetails & {
@@ -82,9 +91,16 @@ export default function CheckerClient() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<CheckResult | null>(null);
   const [mode, setMode] = useState<"address" | "url">("address");
-  const { user } = useAuth();
+  const { user, plan, loading: authLoading } = useAuth();
+  const [usage, setUsage] = useState<CheckUsageSnapshot>(() => getCheckUsageSnapshot("free"));
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setUsage(getCheckUsageSnapshot(plan));
+  }, [plan]);
+
+  useEffect(() => {
+    if (authLoading) return;
     const q = searchParams.get("q");
     if (q) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -92,11 +108,23 @@ export default function CheckerClient() {
       void runCheck(q);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [authLoading]);
 
   async function runCheck(value: string) {
     const input = value.trim();
     if (!input || loading) return;
+
+    if (!canRunCheck(plan)) {
+      setUsage(getCheckUsageSnapshot(plan));
+      setResult({
+        address: "",
+        lat: 0,
+        lng: 0,
+        ward: null,
+        error: `無料チェックは本日${getCheckUsageSnapshot(plan).limit ?? 0}回までです。ログインまたは有料プランで継続できます。`,
+      });
+      return;
+    }
 
     const detectedMode = input.toLowerCase().startsWith("http") ? "url" : "address";
     setMode(detectedMode);
@@ -135,8 +163,11 @@ export default function CheckerClient() {
         };
       }
 
-      const checkRes = await fetch(`/api/check-minpaku?address=${encodeURIComponent(targetAddress)}`);
+      const checkRes = await fetch(`/api/check-minpaku?address=${encodeURIComponent(targetAddress)}`, {
+        headers: await getAuthFetchHeaders(),
+      });
       const checkData = (await checkRes.json()) as CheckResult;
+      setUsage(syncServerCheckUsage(plan, checkData.usage));
 
       const merged = {
         ...checkData,
@@ -146,6 +177,9 @@ export default function CheckerClient() {
       setResult(merged);
 
       if (checkRes.ok && merged.ward && merged.minpakuInfo) {
+        if (!merged.usage) {
+          setUsage(recordCheckUsage(plan));
+        }
         const historyEntry = {
           address: merged.address,
           ward: merged.ward,
@@ -204,13 +238,31 @@ export default function CheckerClient() {
             </div>
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || authLoading || usage.isLimitReached}
               className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl bg-teal-600 px-6 py-4 text-sm font-semibold text-white transition-colors hover:bg-teal-700 disabled:cursor-not-allowed disabled:bg-teal-400 sm:mt-0 sm:w-auto"
             >
               {loading ? <span className="h-5 w-5 animate-spin rounded-full border-2 border-white/40 border-t-white" /> : <Search size={18} />}
               判定する
             </button>
           </form>
+          <div className="mt-3 flex flex-col gap-2 rounded-xl border border-white/15 bg-white/10 px-4 py-3 text-xs text-teal-50 sm:flex-row sm:items-center sm:justify-between">
+            <span>
+              {usage.limit === null
+                ? "有料プラン: 本日のチェック回数は無制限です"
+                : `無料チェック: ${usage.used}/${usage.limit}回 使用済み`}
+            </span>
+            {usage.isLimitReached && (
+              <span className="flex flex-wrap gap-2 font-semibold">
+                <Link href="/auth/login?next=/check" className="underline underline-offset-2">
+                  ログイン
+                </Link>
+                <span>/</span>
+                <Link href="/pricing?source=check" className="underline underline-offset-2">
+                  回数を増やす
+                </Link>
+              </span>
+            )}
+          </div>
 
           <div className="mt-4 flex flex-wrap gap-2">
             {samples.map((sample) => (
@@ -218,7 +270,7 @@ export default function CheckerClient() {
                 key={sample}
                 type="button"
                 onClick={() => handleSampleClick(sample)}
-                disabled={loading}
+                disabled={loading || authLoading || usage.isLimitReached}
                 className="rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-white/20 disabled:opacity-60"
               >
                 {sample}

@@ -15,7 +15,7 @@ import {
   XCircle,
 } from "lucide-react";
 import { useAuth } from "@/lib/AuthContext";
-import { getCurrentPlan, getPlanLimits, PLAN_LABELS, type PlanId } from "@/lib/plan";
+import { getPlanLimits, PLAN_LABELS } from "@/lib/plan";
 import { getCheckHistory, type CheckHistoryEntry } from "@/lib/checkHistory";
 import { deleteSavedReport, getSavedReports, syncDeleteSavedReport, type SavedReport } from "@/lib/savedReports";
 
@@ -25,8 +25,7 @@ function formatLimit(value: number | null) {
 
 export default function DashboardPage() {
   const router = useRouter();
-  const { user, loading } = useAuth();
-  const [plan] = useState<PlanId>(() => getCurrentPlan());
+  const { user, plan, loading } = useAuth();
   const [history, setHistory] = useState<CheckHistoryEntry[]>([]);
   const [savedReports, setSavedReports] = useState<SavedReport[]>([]);
 
@@ -89,20 +88,18 @@ export default function DashboardPage() {
           </div>
           <div className="mt-5 grid grid-cols-3 gap-3">
             <div className="rounded-xl bg-gray-50 p-3">
-              <p className="text-xs text-gray-500">シミュレーター</p>
+              <p className="text-xs text-gray-500">チェック回数</p>
               <p className="mt-1 text-sm font-bold text-gray-900">
-                {limits.revenueSimulator === "detailed" ? "詳細版" : "基本版"}
+                {limits.checksPerDay === null ? "無制限" : `${limits.checksPerDay}回/日`}
               </p>
             </div>
             <div className="rounded-xl bg-gray-50 p-3">
-              <p className="text-xs text-gray-500">物件掲載</p>
-              <p className="mt-1 text-sm font-bold text-gray-900">{formatLimit(limits.listings)}</p>
+              <p className="text-xs text-gray-500">履歴保存</p>
+              <p className="mt-1 text-sm font-bold text-gray-900">{formatLimit(limits.history)}</p>
             </div>
             <div className="rounded-xl bg-gray-50 p-3">
-              <p className="text-xs text-gray-500">メール通知</p>
-              <p className="mt-1 text-sm font-bold text-gray-900">
-                {limits.notifications ? "有効" : "未対応"}
-              </p>
+              <p className="text-xs text-gray-500">レポート保存</p>
+              <p className="mt-1 text-sm font-bold text-gray-900">{formatLimit(limits.savedReports)}</p>
             </div>
           </div>
         </section>
@@ -111,6 +108,9 @@ export default function DashboardPage() {
           <History size={22} className="text-teal-600" />
           <p className="mt-4 text-sm text-gray-500">チェック履歴</p>
           <p className="mt-1 text-2xl font-bold text-gray-900">{history.length}件</p>
+          <p className="mt-1 text-xs text-gray-400">
+            上限: {formatLimit(limits.history)}
+          </p>
           <Link href="/favorites" className="mt-2 block text-xs font-semibold text-teal-600 hover:text-teal-800">
             履歴を見る →
           </Link>
@@ -120,6 +120,9 @@ export default function DashboardPage() {
           <FileText size={22} className="text-teal-600" />
           <p className="mt-4 text-sm text-gray-500">保存レポート</p>
           <p className="mt-1 text-2xl font-bold text-gray-900">{savedReports.length}件</p>
+          <p className="mt-1 text-xs text-gray-400">
+            上限: {formatLimit(limits.savedReports)}
+          </p>
           <Link href="/report" className="mt-2 block text-xs font-semibold text-teal-600 hover:text-teal-800">
             新規作成 →
           </Link>
@@ -243,7 +246,22 @@ export default function DashboardPage() {
           )}
         </div>
 
-        {savedReports.length === 0 ? (
+        {plan === "free" ? (
+          <div className="rounded-2xl border border-amber-200 bg-amber-50 px-6 py-10 text-center">
+            <Crown size={36} className="mx-auto text-amber-600" />
+            <p className="mt-4 font-bold text-amber-950">レポート保存は有料プランで利用できます</p>
+            <p className="mt-2 text-sm leading-6 text-amber-900">
+              無料プランでは詳細レポートのプレビューまで。保存、再閲覧、PDF出力はスタンダード以上で解放されます。
+            </p>
+            <Link
+              href="/pricing?source=dashboard"
+              className="mt-5 inline-flex items-center gap-2 rounded-xl bg-gray-900 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-gray-800"
+            >
+              保存機能を解放
+              <ArrowRight size={14} />
+            </Link>
+          </div>
+        ) : savedReports.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-gray-200 bg-white px-6 py-10 text-center">
             <FileText size={36} className="mx-auto text-gray-200" />
             <p className="mt-4 font-bold text-gray-900">保存済みレポートはまだありません</p>

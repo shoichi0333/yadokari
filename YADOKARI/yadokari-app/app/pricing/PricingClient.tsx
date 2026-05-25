@@ -47,7 +47,7 @@ function getPlans({ standardPriceId, proPriceId }: Pick<PricingClientProps, "sta
       description: "民泊投資の初期調査をすぐに始めたい方向け。",
       price: "0円",
       buttonLabel: "無料で始める",
-      features: ["物件検索", "民泊可否チェック", "届出住宅マップ"],
+      features: ["可否チェック 3回/日", "外部物件リンク集", "届出住宅マップ閲覧", "詳細レポートの無料プレビュー"],
     },
     {
       id: "standard",
@@ -57,7 +57,7 @@ function getPlans({ standardPriceId, proPriceId }: Pick<PricingClientProps, "sta
       buttonLabel: "プランを選択",
       highlighted: true,
       priceId: standardPriceId,
-      features: ["フリー全機能", "お気に入り無制限", "詳細エリアレポート", "収益シミュレーター詳細", "メール通知"],
+      features: ["チェック 100回/日", "詳細レポート保存 50件", "YADOKARI物件分析", "地図の詳細フィルタ/比較/PDF", "収益シミュレーター詳細"],
     },
     {
       id: "pro",
@@ -66,7 +66,7 @@ function getPlans({ standardPriceId, proPriceId }: Pick<PricingClientProps, "sta
       price: "9,800円",
       buttonLabel: "プランを選択",
       priceId: proPriceId,
-      features: ["スタンダード全機能", "物件掲載（5件まで）", "問い合わせ管理", "提案用レポート", "優先サポート"],
+      features: ["スタンダード全機能", "チェック無制限", "物件掲載（5件まで）", "問い合わせ管理", "提案用PDFレポート", "優先サポート"],
     },
   ];
 }
@@ -109,6 +109,10 @@ export default function PricingClient({
   const reportAddress = searchParams.get("address") ?? "";
   const cameFromReport = source === "report";
   const cameFromDashboard = source === "dashboard";
+  const cameFromProperties = source === "properties";
+  const cameFromMap = source === "map";
+  const cameFromCheck = source === "check";
+  const hasSourceMessage = cameFromReport || cameFromDashboard || cameFromProperties || cameFromMap || cameFromCheck;
 
   useEffect(() => {
     if (searchParams.get("checkout") === "success") {
@@ -204,15 +208,29 @@ export default function PricingClient({
               </span>
             ))}
           </div>
-          {(cameFromReport || cameFromDashboard) && (
+          {hasSourceMessage && (
             <div className="mx-auto mt-8 max-w-3xl rounded-2xl border border-white/20 bg-white/10 p-4 text-left backdrop-blur-sm">
               <p className="text-sm font-bold text-white">
-                {cameFromReport ? "詳細レポートの続きへ" : "ダッシュボード機能を拡張"}
+                {cameFromReport
+                  ? "詳細レポートの続きへ"
+                  : cameFromProperties
+                    ? "物件候補をYADOKARIで分析"
+                    : cameFromMap
+                      ? "届出マップを詳細分析へ拡張"
+                      : cameFromCheck
+                        ? "チェック回数を拡張"
+                        : "ダッシュボード機能を拡張"}
               </p>
               <p className="mt-1 text-sm leading-6 text-teal-50">
                 {cameFromReport
                   ? `${reportAddress ? `${reportAddress} の` : ""}無料レポートを、実質利益・初期費用・実務チェックリストまで拡張できます。`
-                  : "詳細レポート、履歴活用、通知、収益分析を使って候補住所の検討を継続できます。"}
+                  : cameFromProperties
+                    ? "外部リンクで見つけた候補物件を、可否・競合・収益・実務タスクまでまとめて確認できます。"
+                    : cameFromMap
+                      ? "地図閲覧は無料のまま、詳細フィルタ、エリア比較、PDF保存を追加できます。"
+                      : cameFromCheck
+                        ? "無料チェック上限を超えた後も、継続して住所調査を進められます。"
+                        : "詳細レポート、履歴活用、通知、収益分析を使って候補住所の検討を継続できます。"}
               </p>
             </div>
           )}

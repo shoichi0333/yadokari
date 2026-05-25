@@ -3,10 +3,11 @@
 import { createContext, useContext, useState, useCallback, useEffect, ReactNode } from "react";
 import { getSupabaseClient } from "@/lib/supabase";
 import { AuthUser, getUser, isSupabaseEnabled, logout as doLogout } from "@/lib/auth";
-import { setCurrentPlan, normalizePlanId } from "@/lib/plan";
+import { getCurrentPlan, setCurrentPlan, normalizePlanId, type PlanId } from "@/lib/plan";
 
 interface AuthContextValue {
   user: AuthUser | null;
+  plan: PlanId;
   loading: boolean;
   refresh: () => Promise<void>;
   logout: () => Promise<void>;
@@ -14,6 +15,7 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue>({
   user: null,
+  plan: "free",
   loading: false,
   refresh: async () => {},
   logout: async () => {},
@@ -34,18 +36,21 @@ function createAuthUser(user: {
   };
 }
 
-async function syncPlanByEmail(email?: string | null): Promise<void> {
+async function syncPlanByEmail(email?: string | null): Promise<PlanId> {
   if (!email) {
     setCurrentPlan("free");
-    return;
+    return "free";
   }
 
   try {
     const response = await fetch(`/api/user/plan?email=${encodeURIComponent(email)}`);
     const data = (await response.json()) as { plan?: string | null };
-    setCurrentPlan(normalizePlanId(data.plan));
+    const nextPlan = normalizePlanId(data.plan);
+    setCurrentPlan(nextPlan);
+    return nextPlan;
   } catch {
     setCurrentPlan("free");
+    return "free";
   }
 }
 
@@ -53,6 +58,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(() =>
     typeof window !== "undefined" && !isSupabaseEnabled() ? getUser() : null
   );
+  const [plan, setPlan] = useState<PlanId>(() => getCurrentPlan());
   const [loading, setLoading] = useState(() => isSupabaseEnabled());
 
   const refresh = useCallback(async () => {
@@ -61,13 +67,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const { data } = (await supabase?.auth.getSession()) ?? { data: { session: null } };
       const nextUser = data.session?.user ? createAuthUser(data.session.user) : null;
       setUser(nextUser);
-      await syncPlanByEmail(nextUser?.email);
+      setPlan(await syncPlanByEmail(nextUser?.email));
       return;
     }
 
     const nextUser = getUser();
     setUser(nextUser);
-    await syncPlanByEmail(nextUser?.email);
+    setPlan(await syncPlanByEmail(nextUser?.email));
   }, []);
 
   useEffect(() => {
@@ -84,10 +90,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return;
     }
 
-    supabase.auth.getSession().then(({ data }) => {
+    supabase.auth.getSession().then(async ({ data }) => {
       const nextUser = data.session?.user ? createAuthUser(data.session.user) : null;
       setUser(nextUser);
-      void syncPlanByEmail(nextUser?.email);
+      setPlan(await syncPlanByEmail(nextUser?.email));
       setLoading(false);
     });
 
@@ -96,8 +102,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } = supabase.auth.onAuthStateChange((_event, session) => {
       const nextUser = session?.user ? createAuthUser(session.user) : null;
       setUser(nextUser);
-      void syncPlanByEmail(nextUser?.email);
-      setLoading(false);
+      void syncPlanByEmail(nextUser?.email).then((nextPlan) => {
+        setPlan(nextPlan);
+        setLoading(false);
+      });
     });
 
     return () => {
@@ -109,10 +117,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await doLogout();
     setUser(null);
     setCurrentPlan("free");
+    setPlan("free");
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, loading, refresh, logout }}>
+    <AuthContext.Provider value={{ user, plan, loading, refresh, logout }}>
       {children}
     </AuthContext.Provider>
   );

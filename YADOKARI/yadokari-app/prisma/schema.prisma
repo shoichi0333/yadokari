@@ -101,6 +101,24 @@ model CheckHistory {
   @@unique([userId, address])
 }
 
+model CheckUsage {
+  id         String          @id @default(uuid())
+  scope      CheckUsageScope
+  identifier String
+  date       String
+  count      Int             @default(0)
+  createdAt  DateTime        @default(now())
+  updatedAt  DateTime        @updatedAt
+
+  @@index([date])
+  @@unique([scope, identifier, date])
+}
+
+enum CheckUsageScope {
+  USER
+  ANONYMOUS
+}
+
 model SavedReport {
   id                String   @id @default(uuid())
   userId            String
