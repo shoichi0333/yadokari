@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useState } from "react";
 import type { ReactNode } from "react";
 import { ArrowLeft, CheckCircle2, Loader2, Send } from "lucide-react";
 import PlanGate from "@/components/PlanGate";
-import { getCurrentPlan, type PlanId } from "@/lib/plan";
+import { useAuth } from "@/lib/AuthContext";
+import { getAuthFetchHeaders } from "@/lib/authFetch";
 
 const PREFECTURES = [
   "北海道", "青森県", "岩手県", "宮城県", "秋田県", "山形県", "福島県",
@@ -61,21 +62,13 @@ const initialForm: FormState = {
 };
 
 export default function SubmitPropertyForm() {
-  const [plan, setPlan] = useState<PlanId>(() => getCurrentPlan());
+  const { plan, loading: authLoading } = useAuth();
   const [form, setForm] = useState<FormState>(initialForm);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submittedId, setSubmittedId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const timer = window.setTimeout(() => {
-      setPlan(getCurrentPlan());
-    }, 0);
-
-    return () => window.clearTimeout(timer);
-  }, []);
-
-  if (plan !== "pro") {
+  if (authLoading || plan !== "pro") {
     return (
       <main className="min-h-screen bg-slate-50">
         <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
@@ -103,7 +96,10 @@ export default function SubmitPropertyForm() {
     try {
       const response = await fetch("/api/listings", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(await getAuthFetchHeaders()),
+        },
         body: JSON.stringify({
           ...form,
           rent: form.rent ? Number(form.rent) : undefined,

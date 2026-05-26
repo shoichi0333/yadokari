@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { getSupabaseServerClient } from "@/lib/supabase";
 
 type ListingPayload = {
   title?: unknown;
@@ -19,6 +20,23 @@ type ListingPayload = {
 };
 
 const REQUIRED_FIELDS = ["title", "address", "prefecture", "city", "rent", "layout", "description", "contactEmail"] as const;
+
+async function getAuthorizedListingUser(request: NextRequest) {
+  const authHeader = request.headers.get("authorization");
+  const token = authHeader?.match(/^Bearer\s+(.+)$/i)?.[1];
+
+  if (!token) return null;
+
+  const supabase = getSupabaseServerClient();
+  const { data } = (await supabase?.auth.getUser(token)) ?? { data: { user: null } };
+  const email = data.user?.email;
+  if (!email || !process.env.DATABASE_URL) return null;
+
+  return prisma.user.findUnique({
+    where: { email },
+    select: { id: true, plan: true },
+  });
+}
 
 function toTrimmedString(value: unknown): string {
   return typeof value === "string" ? value.trim() : "";
@@ -61,6 +79,16 @@ function getMissingFields(payload: ListingPayload): string[] {
 
 export async function POST(request: NextRequest) {
   try {
+    const user = await getAuthorizedListingUser(request);
+
+    if (!user) {
+      return NextResponse.json({ error: "ログインが必要です" }, { status: 401 });
+    }
+
+    if (user.plan !== "PRO") {
+      return NextResponse.json({ error: "物件掲載はプロプランで利用できます" }, { status: 403 });
+    }
+
     const payload = (await request.json()) as ListingPayload;
     const missingFields = getMissingFields(payload);
 
@@ -88,22 +116,6 @@ export async function POST(request: NextRequest) {
       contactEmail: toTrimmedString(payload.contactEmail),
       contactPhone: toOptionalString(payload.contactPhone),
     };
-
-    if (!process.env.DATABASE_URL) {
-      const id = `mock_${Date.now()}`;
-      console.log("Property listing submission:", { id, ...listingData, status: "PENDING" });
-      return NextResponse.json({ id, status: "PENDING" });
-    }
-
-    const user = await prisma.user.upsert({
-      where: { email: listingData.contactEmail },
-      update: {},
-      create: {
-        email: listingData.contactEmail,
-        name: listingData.contactEmail.split("@")[0] || "Listing Owner",
-        plan: "PRO",
-      },
-    });
 
     const listing = await prisma.propertyListing.create({
       data: {

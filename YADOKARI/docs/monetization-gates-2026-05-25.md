@@ -23,6 +23,7 @@ This note records the production paywall boundaries introduced for the first pai
 - `/map`: map viewing stays free. Advanced filters, area comparison, and PDF/print export are paid.
 - `/dashboard`: login is required for saved user data. Saved reports are paid-only.
 - `/favorites`: login is required for saved check/history surfaces.
+- `/submit-property`: property listing submissions require a logged-in Pro user. Submitted listings are stored as `PENDING` and are not public until reviewed and marked `ACTIVE`.
 
 ## Current Enforcement Level
 
