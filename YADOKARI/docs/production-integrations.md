@@ -66,10 +66,12 @@ STRIPE_WEBHOOK_SECRET=
 NEXT_PUBLIC_GA_MEASUREMENT_ID=
 RESEND_API_KEY=
 CONTACT_EMAIL=
+ADMIN_EMAILS=
 NEXT_PUBLIC_PROPERTY_MARKETPLACE_ENABLED=false
 ```
 
 Keep `NEXT_PUBLIC_PROPERTY_MARKETPLACE_ENABLED=false` in production until listings are reviewed and ready for publication. When false, `/properties` shows a preparation page, `/api/properties` returns an empty list, property detail pages redirect to `/properties`, and individual property URLs are omitted from the sitemap.
+Set `ADMIN_EMAILS` to the comma-separated email addresses allowed to use `/admin/listings`. If omitted, the admin API falls back to `CONTACT_EMAIL`.
 
 ## Google Search Console and Analytics
 
@@ -110,6 +112,7 @@ Secret rotation:
 Property marketplace gate:
 
 - Keep `NEXT_PUBLIC_PROPERTY_MARKETPLACE_ENABLED=false` until the displayed listings are real, reviewed, and approved for publication.
+- Review submitted property listings at `/admin/listings`; only authenticated users whose email is listed in `ADMIN_EMAILS` or `CONTACT_EMAIL` can approve or reject submissions.
 - When enabling the marketplace, re-add intended listing URLs to the sitemap only after the content is production-ready.
 
 ## Supabase

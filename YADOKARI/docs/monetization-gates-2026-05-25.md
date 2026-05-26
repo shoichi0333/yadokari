@@ -24,6 +24,7 @@ This note records the production paywall boundaries introduced for the first pai
 - `/dashboard`: login is required for saved user data. Saved reports are paid-only.
 - `/favorites`: login is required for saved check/history surfaces.
 - `/submit-property`: property listing submissions require a logged-in Pro user. Submitted listings are stored as `PENDING` and are not public until reviewed and marked `ACTIVE`.
+- `/admin/listings`: admin-only review surface for `PropertyListing` submissions. Admin access is controlled by `ADMIN_EMAILS`, falling back to `CONTACT_EMAIL` when `ADMIN_EMAILS` is omitted.
 
 ## Current Enforcement Level
 
