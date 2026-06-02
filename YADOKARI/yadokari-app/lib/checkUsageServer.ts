@@ -3,6 +3,7 @@ import type { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSupabaseServerClient } from "@/lib/supabase";
 import { getPlanLimits, normalizePlanId, type PlanId } from "@/lib/plan";
+import { isAdminEmail } from "@/lib/adminAuth";
 
 type UsageScope = "USER" | "ANONYMOUS";
 
@@ -82,6 +83,10 @@ async function resolveRequester(request: NextRequest): Promise<{
     const authUser = data.user;
 
     if (authUser?.email) {
+      if (isAdminEmail(authUser.email)) {
+        return { plan: "pro" as PlanId, scope: "USER", identifier: authUser.id };
+      }
+
       let plan: PlanId = "free";
 
       if (process.env.DATABASE_URL) {

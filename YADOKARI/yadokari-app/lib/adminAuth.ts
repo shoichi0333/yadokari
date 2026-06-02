@@ -13,6 +13,10 @@ function parseAdminEmails(): string[] {
     .filter(Boolean);
 }
 
+export function isAdminEmail(email: string): boolean {
+  return parseAdminEmails().includes(email.toLowerCase());
+}
+
 export async function requireAdmin(request: NextRequest): Promise<AdminAuthResult> {
   const token = request.headers.get("authorization")?.match(/^Bearer\s+(.+)$/i)?.[1];
 

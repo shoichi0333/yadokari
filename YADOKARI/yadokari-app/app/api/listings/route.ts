@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSupabaseServerClient } from "@/lib/supabase";
+import { isPropertyMarketplaceEnabled } from "@/lib/property-marketplace";
 
 type ListingPayload = {
   title?: unknown;
@@ -136,15 +137,42 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    if (!process.env.DATABASE_URL) {
+    if (!process.env.DATABASE_URL || !isPropertyMarketplaceEnabled()) {
       return NextResponse.json([]);
     }
 
+    const searchParams = request.nextUrl.searchParams;
+    const prefecture = searchParams.get("prefecture")?.trim() || undefined;
+    const layout = searchParams.get("layout")?.trim() || undefined;
+    const limitParam = searchParams.get("limit");
+    const limit = limitParam ? Math.min(parseInt(limitParam, 10) || 20, 100) : 20;
+
     const listings = await prisma.propertyListing.findMany({
-      where: { status: "ACTIVE" },
+      where: {
+        status: "ACTIVE",
+        ...(prefecture ? { prefecture: { equals: prefecture } } : {}),
+        ...(layout ? { layout: { equals: layout } } : {}),
+      },
+      select: {
+        id: true,
+        title: true,
+        prefecture: true,
+        city: true,
+        address: true,
+        rent: true,
+        layout: true,
+        areaSqm: true,
+        ageYears: true,
+        zoning: true,
+        isTokkuArea: true,
+        features: true,
+        description: true,
+        createdAt: true,
+      },
       orderBy: { createdAt: "desc" },
+      take: limit,
     });
 
     return NextResponse.json(listings);

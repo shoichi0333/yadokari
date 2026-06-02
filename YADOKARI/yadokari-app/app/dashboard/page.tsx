@@ -11,6 +11,7 @@ import {
   History,
   MapPin,
   Search,
+  Settings2,
   Shield,
   XCircle,
 } from "lucide-react";
@@ -18,6 +19,7 @@ import { useAuth } from "@/lib/AuthContext";
 import { getPlanLimits, PLAN_LABELS } from "@/lib/plan";
 import { getCheckHistory, type CheckHistoryEntry } from "@/lib/checkHistory";
 import { deleteSavedReport, getSavedReports, syncDeleteSavedReport, type SavedReport } from "@/lib/savedReports";
+import { getAuthFetchHeaders } from "@/lib/authFetch";
 
 function formatLimit(value: number | null) {
   return value === null ? "無制限" : `${value}件`;
@@ -28,6 +30,7 @@ export default function DashboardPage() {
   const { user, plan, loading } = useAuth();
   const [history, setHistory] = useState<CheckHistoryEntry[]>([]);
   const [savedReports, setSavedReports] = useState<SavedReport[]>([]);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -40,6 +43,16 @@ export default function DashboardPage() {
     setHistory(getCheckHistory());
     setSavedReports(getSavedReports());
   }, []);
+
+  useEffect(() => {
+    if (!user) return;
+    void getAuthFetchHeaders().then((headers) =>
+      fetch("/api/admin/check", { headers })
+        .then((r) => r.json())
+        .then((data: { isAdmin?: boolean }) => setIsAdmin(data.isAdmin === true))
+        .catch(() => setIsAdmin(false)),
+    );
+  }, [user]);
 
   const limits = getPlanLimits(plan);
 
@@ -60,12 +73,20 @@ export default function DashboardPage() {
           <h1 className="mt-1 text-2xl font-bold text-gray-900">ダッシュボード</h1>
           <p className="mt-2 text-sm text-gray-500">{user.name}さんの利用状況</p>
         </div>
-        {plan === "free" && (
+        {plan === "free" ? (
           <Link
             href="/pricing"
             className="inline-flex items-center gap-2 rounded-xl bg-teal-600 px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-teal-700"
           >
             プランをアップグレード
+            <ArrowRight size={16} />
+          </Link>
+        ) : (
+          <Link
+            href="/billing"
+            className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-5 py-3 text-sm font-semibold text-gray-700 transition-colors hover:border-teal-200 hover:bg-teal-50"
+          >
+            プラン・課金管理
             <ArrowRight size={16} />
           </Link>
         )}
@@ -166,7 +187,7 @@ export default function DashboardPage() {
       </section>
 
       {/* クイックアクション */}
-      <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-4">
+      <div className={`mb-8 grid grid-cols-1 gap-4 ${isAdmin ? "sm:grid-cols-4 lg:grid-cols-5" : "sm:grid-cols-4"}`}>
         <Link
           href="/check"
           className="flex items-center justify-between rounded-2xl border border-gray-100 bg-white p-5 shadow-sm transition-colors hover:border-teal-200"
@@ -230,6 +251,24 @@ export default function DashboardPage() {
           </span>
           <ArrowRight size={18} className="text-gray-300" />
         </Link>
+
+        {isAdmin && (
+          <Link
+            href="/admin/listings"
+            className="flex items-center justify-between rounded-2xl border border-amber-100 bg-amber-50 p-5 shadow-sm transition-colors hover:border-amber-200"
+          >
+            <span className="flex items-center gap-3">
+              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-100 text-amber-700">
+                <Settings2 size={20} />
+              </span>
+              <span>
+                <span className="block font-bold text-gray-900">掲載申請管理</span>
+                <span className="text-sm text-gray-500">審査・公開操作</span>
+              </span>
+            </span>
+            <ArrowRight size={18} className="text-gray-300" />
+          </Link>
+        )}
       </div>
 
       {/* 保存レポート */}

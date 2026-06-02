@@ -193,6 +193,8 @@ Security notes:
 - `/api/checkout` only accepts price IDs matching the configured plan.
 - checkout `successUrl` and `cancelUrl` must match `NEXT_PUBLIC_SITE_URL`.
 - checkout sessions and subscriptions both receive `planType` metadata.
+- Paid users can manage subscription details through `/billing`, which creates a Stripe Billing Portal session through `/api/billing-portal`.
+- Billing Portal requires the database user to have `stripeCustomerId`, which is written by the Stripe checkout webhook.
 
 ## Resend
 

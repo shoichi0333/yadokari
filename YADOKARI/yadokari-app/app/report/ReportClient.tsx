@@ -437,7 +437,11 @@ export default function ReportClient() {
 
             <div className="grid gap-4 md:grid-cols-3">
               <ActionCard icon={<Building2 size={18} />} title="候補物件を探す" href={result.prefecture ? `/properties?prefecture=${encodeURIComponent(result.prefecture)}` : "/properties"} />
-              <ActionCard icon={<TrendingUp size={18} />} title="詳細レポートを解放" href={pricingHref} />
+              {reportUnlocked ? (
+                <ActionCard icon={<Save size={18} />} title="レポートを保存する" href="#" onClick={handleSaveReport} />
+              ) : (
+                <ActionCard icon={<TrendingUp size={18} />} title="詳細レポートを解放" href={pricingHref} />
+              )}
               <ActionCard icon={<Mail size={18} />} title="相談する" href={`/contact?address=${encodeURIComponent(result.address)}`} />
             </div>
           </div>
@@ -673,12 +677,10 @@ function ReportRow({ label, value }: { label: string; value: string }) {
   );
 }
 
-function ActionCard({ icon, title, href }: { icon: React.ReactNode; title: string; href: string }) {
-  return (
-    <Link
-      href={href}
-      className="flex items-center justify-between rounded-2xl border border-gray-100 bg-white p-5 text-sm font-bold text-gray-900 shadow-sm transition-all hover:border-teal-200 hover:shadow-md"
-    >
+function ActionCard({ icon, title, href, onClick }: { icon: React.ReactNode; title: string; href: string; onClick?: () => void }) {
+  const className = "flex items-center justify-between rounded-2xl border border-gray-100 bg-white p-5 text-sm font-bold text-gray-900 shadow-sm transition-all hover:border-teal-200 hover:shadow-md";
+  const inner = (
+    <>
       <span className="flex items-center gap-3">
         <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-teal-50 text-teal-700">
           {icon}
@@ -686,6 +688,18 @@ function ActionCard({ icon, title, href }: { icon: React.ReactNode; title: strin
         {title}
       </span>
       <ArrowRight size={15} className="text-gray-300" />
+    </>
+  );
+  if (onClick) {
+    return (
+      <button type="button" onClick={onClick} className={className}>
+        {inner}
+      </button>
+    );
+  }
+  return (
+    <Link href={href} className={className}>
+      {inner}
     </Link>
   );
 }
